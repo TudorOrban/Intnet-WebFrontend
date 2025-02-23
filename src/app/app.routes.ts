@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { MapComponent } from './features/map/components/map/map.component';
+import { GridComponent } from './features/grid/components/grid/grid.component';
 
 export const routes: Routes = [
     {
         path: "map",
-        component: MapComponent
+        component: GridComponent
     }
 ];

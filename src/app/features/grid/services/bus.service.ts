@@ -8,7 +8,7 @@ import { HttpClient } from "@angular/common/http";
     providedIn: "root"
 })
 export class BusService {
-    private apiUrl = `${environment.apiUrl}/grids`;
+    private apiUrl = `${environment.apiUrl}/buses`;
 
     constructor(
         private http: HttpClient

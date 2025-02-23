@@ -1,4 +1,7 @@
 @import url("styles/main.css");
+@import url("styles/common.css");
+
+@import url("assets/leaflet.css");
 
 @import "tailwindcss";
 

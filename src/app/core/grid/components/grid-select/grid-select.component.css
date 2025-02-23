@@ -1,10 +1,10 @@
 .grid-select {
     background-color: var(--secondary-color);
-    border: 2px solid rgb(32, 32, 32);
+    border: 2px solid rgb(35, 35, 35);
     color: rgb(240, 240, 240);
 }
 
 .grid-select-popover {
     background-color: var(--secondary-color);
-    border: 2px solid rgb(32, 32, 32);
+    border: 1px solid rgb(35, 35, 35);
 }
