@@ -10,6 +10,7 @@ import {
   faNetworkWired,
   faTowerObservation,
   faGear,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UIItem } from "../../../shared/common/types/Navigation";
@@ -26,7 +27,7 @@ export class SidebarComponent {
     currentRoute?: string;
     sidebarItems: UIItem[] = [
         { label: "Dashboard", value: "dashboard", icon: faSquarePollVertical, link: "/dashboard" },
-        { label: "Organization", value: "organization", icon: faUsersBetweenLines, link: "/organization" },
+        { label: "Organization", value: "organization", icon: faUsers, link: "/organization" },
         {
             label: "Grids",
             value: "grids",
