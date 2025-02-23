@@ -5,6 +5,8 @@ import { SelectedGridService } from '../../../../core/grid/services/selected-gri
 import { Subscription } from 'rxjs';
 import { BusSearchDto } from '../../models/Bus';
 import { GridMapComponent } from "./grid-map/grid-map.component";
+import { EdgeService } from '../../services/edge.service';
+import { EdgeSearchDto } from '../../models/Edge';
 
 @Component({
   selector: 'app-grid',
@@ -17,9 +19,11 @@ export class GridComponent implements OnInit, OnDestroy {
     private subscription?: Subscription;
 
     buses?: BusSearchDto[];
+    edges?: EdgeSearchDto[];
 
     constructor(
         private readonly busService: BusService,
+        private readonly edgeService: EdgeService,
         private readonly selectedGridService: SelectedGridService
     ) {}
 
@@ -32,8 +36,13 @@ export class GridComponent implements OnInit, OnDestroy {
 
             this.busService.getBusesByGridId(this.gridId).subscribe(
                 (data) => {
-                    console.log("Data", data);
                     this.buses = data;
+                }
+            );
+            this.edgeService.getEdgesByGridId(this.gridId).subscribe(
+                (data) => {
+                    console.log("Data", data);
+                    this.edges = data;
                 }
             );
         })
