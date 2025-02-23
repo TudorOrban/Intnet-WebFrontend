@@ -1,3 +1,5 @@
+import { GeneratorSearchDto } from "./Generator";
+
 export interface BusSearchDto {
     id: number;
     gridId: number;
@@ -6,6 +8,10 @@ export interface BusSearchDto {
     updatedAt: Date;
     latitude: number;
     longitude: number;
+
+    state?: BusStateDto;
+
+    generators?: GeneratorSearchDto[];
 }
 
 export interface CreateBusDto {

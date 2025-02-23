@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ComponentRef, EmbeddedViewRef, Input, OnChanges, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { Component, EmbeddedViewRef, Input, OnChanges, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { BusSearchDto } from '../../../models/Bus';
 import { NodeComponent } from './node/node.component';
-import { EdgeSearchDto, EdgeUI } from '../../../models/Edge';
+import { EdgeUI } from '../../../models/Edge';
 
 @Component({
   selector: 'app-grid-map',
@@ -32,9 +32,9 @@ export class GridMapComponent implements OnInit, OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes["nodes"]?.currentValue) {
             this.nodes = changes["nodes"]?.currentValue;
-            
+            console.log("Nodes", this.nodes);
             this.renderNodes();
-            
+
             if (this.edges && !this.areEdgesRendered) {
                 this.renderEdges();
             }

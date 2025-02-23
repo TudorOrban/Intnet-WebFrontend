@@ -14,8 +14,8 @@ export class BusService {
         private http: HttpClient
     ) {}
 
-    getBusesByGridId(gridId: number): Observable<BusSearchDto[]> {
-        return this.http.get<BusSearchDto[]>(`${this.apiUrl}/grid/${gridId}`);    
+    getBusesByGridId(gridId: number, attachComponents?: boolean): Observable<BusSearchDto[]> {
+        return this.http.get<BusSearchDto[]>(`${this.apiUrl}/grid/${gridId}?attachComponents=${attachComponents ?? false}`);    
     }
 
     getBusById(id: number): Observable<BusSearchDto> {

@@ -34,7 +34,7 @@ export class GridComponent implements OnInit, OnDestroy {
             }
             this.gridId = grid?.id;
 
-            this.busService.getBusesByGridId(this.gridId).subscribe(
+            this.busService.getBusesByGridId(this.gridId, true).subscribe(
                 (data) => {
                     this.buses = data;
                 }
