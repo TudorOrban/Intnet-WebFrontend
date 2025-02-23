@@ -6,7 +6,7 @@
         <fa-icon [icon]="item.icon ?? faHome" class="text-lg text-gray-200"></fa-icon>
         <button 
             (click)="navigateTo(item)" 
-            class="text-lg font-semibold text-gray-200 hover:text-white"
+            class="text-lg font-semibold text-gray-200 hover:text-white cursor-pointer"
             [ngClass]="{
                 'text-white': item?.value === currentRoute
             }"

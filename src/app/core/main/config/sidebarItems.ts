@@ -1,6 +1,6 @@
 import {
     faGear,
-    faNetworkWired,
+    faMap,
     faSquarePollVertical,
     faTowerObservation,
     faUsers,
@@ -21,10 +21,10 @@ export const sidebarItems: UIItem[] = [
         link: "/organization",
     },
     {
-        label: "Grids",
-        value: "grids",
-        icon: faNetworkWired,
-        link: "/grids",
+        label: "Map",
+        value: "map",
+        icon: faMap,
+        link: "/map",
     },
     {
         label: "Monitoring",

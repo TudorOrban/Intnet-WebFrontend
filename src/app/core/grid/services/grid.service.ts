@@ -23,7 +23,7 @@ export class GridService {
     }
 
     updateGrid(gridDto: UpdateGridDto): Observable<GridSearchDto> {
-        return this.http.post<GridSearchDto>(this.apiUrl, gridDto);
+        return this.http.put<GridSearchDto>(this.apiUrl, gridDto);
     }
 
     deleteGrid(id: number): Observable<void> {
