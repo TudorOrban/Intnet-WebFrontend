@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { HttpClient } from "@angular/common/http";
-import { CreateGridDto, GridSearchDto, UpdateGridDto } from "../model/Grid";
+import { CreateGridDto, GridSearchDto, UpdateGridDto } from "../models/Grid";
 import { Observable } from "rxjs";
 
 @Injectable({

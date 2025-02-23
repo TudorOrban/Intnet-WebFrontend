@@ -1,0 +1,25 @@
+<div class="p-4">
+    <div class="relative flex items-center justify-center w-full py-2 grid-select rounded-md cursor-pointer" (click)="toggleIsSelectOpen()">
+        <div class="text-xl font-semibold">
+            {{ selectedGrid?.name ?? "" }}
+        </div>
+    
+        <div *ngIf="isSelectOpen" class="absolute left-0 top-0 flex flex-col items-start mt-12 w-full px-6 py-4 space-y-4 grid-select-popover font-semibold rounded-b-md shadow-sm">
+            <button
+                *ngFor="let grid of grids" 
+                (click)="selectGrid(grid.id)"
+                class="text-lg cursor-pointer text-gray-300 hover:text-white"
+                [ngClass]="{
+                    'text-white': grid?.id === selectedGrid?.id
+                }"
+            >
+                {{ grid.name }}
+            </button>
+
+            <button class="flex items-center space-x-2 pt-2 text-gray-300 hover:text-white cursor-pointer" (click)="addGrid()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                <div class="">Add Grid</div>
+            </button>
+        </div>
+    </div>    
+</div>
