@@ -2,6 +2,7 @@ export interface GeneratorSearchDto {
     id: number;
     gridId: number;
     generatorName?: string;
+    generatorType?: GeneratorType;
     createdAt: Date;
     updatedAt: Date;
     generatorVoltageSetpoint?: number;
@@ -11,6 +12,12 @@ export interface GeneratorSearchDto {
     generatorMinReactivePower?: number;
 
     state?: GeneratorStateDto;
+}
+
+export enum GeneratorType {
+    NUCLEAR,
+    COAL,
+    GAS
 }
 
 export interface CreateGeneratorDto {

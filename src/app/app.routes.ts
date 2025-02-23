@@ -3,7 +3,7 @@ import { GridComponent } from './features/grid/components/grid/grid.component';
 
 export const routes: Routes = [
     {
-        path: "map",
+        path: "grid",
         component: GridComponent
     }
 ];

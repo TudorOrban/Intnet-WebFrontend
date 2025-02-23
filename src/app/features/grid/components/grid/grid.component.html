@@ -1,13 +1,28 @@
-<div class="page-std-padding-x page-std-padding-y">
-    <div class="flex items-center justify-between w-full py-4">
-        <div class="text-2xl font-semibold">
-            Map
+<div class="page-std-padding-x page-std-padding-y overflow-y-auto">
+    <div class="flex items-center justify-between w-full pb-4">
+        <div class="flex items-center space-x-4">
+            <fa-icon [icon]="faDiagramProject"></fa-icon>
+            <div class="text-2xl font-semibold">
+                Map
+            </div>
         </div>
 
         <div class="flex items-center space-x-2">
-            <button>
-                Add Bus
+            <button class="standard-write-button" (click)="toggleAddMenu()">
+                <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
+                <div>
+                    Add
+                </div>
             </button>
+        </div>
+    </div>
+
+    <div *ngIf="isAddMenuOpen" class="flex items-center justify-between flex-wrap w-full px-4 pb-4">
+        <div *ngFor="let option of addOptions" class="flex items-center space-x-2">
+            <fa-icon [icon]="option?.icon ?? faQuestion"></fa-icon>
+            <div class="text-lg font-semibold">
+                {{ option?.label }}
+            </div>
         </div>
     </div>
 

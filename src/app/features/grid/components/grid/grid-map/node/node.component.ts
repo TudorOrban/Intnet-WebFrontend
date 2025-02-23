@@ -11,5 +11,4 @@ import { CommonModule } from '@angular/common';
 export class NodeComponent {
     @Input() node?: BusSearchDto;
 
-
 }

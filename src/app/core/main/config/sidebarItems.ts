@@ -1,4 +1,6 @@
 import {
+    faCircleNodes,
+    faDiagramProject,
     faGear,
     faMap,
     faSquarePollVertical,
@@ -21,10 +23,10 @@ export const sidebarItems: UIItem[] = [
         link: "/organization",
     },
     {
-        label: "Map",
-        value: "map",
-        icon: faMap,
-        link: "/map",
+        label: "Grid",
+        value: "grid",
+        icon: faDiagramProject,
+        link: "/grid",
     },
     {
         label: "Monitoring",

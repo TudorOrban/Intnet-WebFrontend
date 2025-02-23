@@ -7,10 +7,13 @@ import { BusSearchDto } from '../../models/Bus';
 import { GridMapComponent } from "./grid-map/grid-map.component";
 import { EdgeService } from '../../services/edge.service';
 import { EdgeSearchDto } from '../../models/Edge';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCodeCommit, faCodeMerge, faDiagramProject, faIndustry, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { UIItem } from '../../../../shared/common/types/Navigation';
 
 @Component({
   selector: 'app-grid',
-  imports: [CommonModule, GridMapComponent],
+  imports: [CommonModule, FontAwesomeModule, GridMapComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.css'
 })
@@ -20,6 +23,25 @@ export class GridComponent implements OnInit, OnDestroy {
 
     buses?: BusSearchDto[];
     edges?: EdgeSearchDto[];
+
+    isAddMenuOpen: boolean = false;
+    addOptions: UIItem[] = [
+        {
+            label: "Bus",
+            value: "bus",
+            icon: faCodeMerge
+        },
+        {
+            label: "Edge",
+            value: "edge",
+            icon: faCodeCommit
+        },
+        {
+            label: "Generator",
+            value: "generator",
+            icon: faIndustry
+        }
+    ];
 
     constructor(
         private readonly busService: BusService,
@@ -53,4 +75,12 @@ export class GridComponent implements OnInit, OnDestroy {
             this.subscription.unsubscribe();
         }
     }
+
+    toggleAddMenu(): void {
+        this.isAddMenuOpen = !this.isAddMenuOpen;
+    }
+
+    faPlus = faPlus;
+    faDiagramProject = faDiagramProject;
+    faQuestion = faQuestion;
 }

@@ -94,8 +94,9 @@ export class GridMapComponent implements OnInit, OnChanges {
             const marker = this.L.marker([node.latitude, node.longitude], {
                 icon: this.L.divIcon({
                     html: domElement,
-                    class: "flex items-center justify-center w-20 h-20",
+                    class: "flex items-center justify-center w-6 h-6",
                     className: "div-icon-custom",
+                    iconSize: [20, 20]
                 }),
             });
 
@@ -109,6 +110,10 @@ export class GridMapComponent implements OnInit, OnChanges {
     }
 
     renderEdges(): void {
+        if (!this.L) {
+            return;
+        }
+        
         this.edges?.forEach(edge => {
             const srcNode = (this.nodes ?? []).find(n => n.id === edge.srcBusId);
             const destNode = (this.nodes ?? []).find(n => n.id === edge.destBusId);
