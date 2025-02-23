@@ -55,3 +55,9 @@ export enum EdgeType {
     DISTRIBUTION,
     TRANSFORMER
 }
+
+// UI
+export interface EdgeUI extends EdgeSearchDto {
+    srcNodeLatLong?: number[];
+    destNodeLatLong?: number[];
+}

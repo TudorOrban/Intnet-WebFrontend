@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ComponentRef, EmbeddedViewRef, Input, OnChanges, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { BusSearchDto } from '../../../models/Bus';
 import { NodeComponent } from './node/node.component';
+import { EdgeSearchDto, EdgeUI } from '../../../models/Edge';
 
 @Component({
   selector: 'app-grid-map',
@@ -11,11 +12,13 @@ import { NodeComponent } from './node/node.component';
 })
 export class GridMapComponent implements OnInit, OnChanges {
     @Input() nodes?: BusSearchDto[];
+    @Input() edges?: EdgeUI[];
 
     private map: any;
     private L: any;
 
     isMapInitialized: boolean = false;
+    areEdgesRendered: boolean = false;
 
     constructor(
         private viewContainerRef: ViewContainerRef,
@@ -30,7 +33,16 @@ export class GridMapComponent implements OnInit, OnChanges {
         if (changes["nodes"]?.currentValue) {
             this.nodes = changes["nodes"]?.currentValue;
             
-            this.drawNodes();
+            this.renderNodes();
+            
+            if (this.edges && !this.areEdgesRendered) {
+                this.renderEdges();
+            }
+        }
+        if (changes["edges"]?.currentValue) {
+            this.edges = changes["edges"]?.currentValue;
+
+            this.renderEdges();
         }
     }
 
@@ -67,7 +79,7 @@ export class GridMapComponent implements OnInit, OnChanges {
         });
     }
 
-    drawNodes(): void {
+    renderNodes(): void {
         if (!this.L) {
             return;
         }
@@ -82,9 +94,8 @@ export class GridMapComponent implements OnInit, OnChanges {
             const marker = this.L.marker([node.latitude, node.longitude], {
                 icon: this.L.divIcon({
                     html: domElement,
-                    class: "flex justify-center",
+                    class: "flex items-center justify-center w-20 h-20",
                     className: "div-icon-custom",
-                    iconSize: [8, 8]
                 }),
             });
 
@@ -94,6 +105,27 @@ export class GridMapComponent implements OnInit, OnChanges {
                 this.map.setView([node.latitude, node.longitude], 6); // TODO: Center around whole grid at appropriate zoom level
             }
             
+        });
+    }
+
+    renderEdges(): void {
+        this.edges?.forEach(edge => {
+            const srcNode = (this.nodes ?? []).find(n => n.id === edge.srcBusId);
+            const destNode = (this.nodes ?? []).find(n => n.id === edge.destBusId);
+
+            if (!srcNode?.latitude || !srcNode?.longitude || !destNode?.latitude || !destNode?.longitude) {
+                return;
+            }
+
+            edge.srcNodeLatLong = [srcNode.latitude, srcNode.longitude];
+            edge.destNodeLatLong = [destNode.latitude, destNode.longitude];
+            
+            this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
+                color: "blue",
+                weight: 3
+            }).addTo(this.map);
+
+            this.areEdgesRendered = true;
         });
     }
 }
