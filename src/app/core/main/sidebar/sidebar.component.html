@@ -1,5 +1,20 @@
-<div class="flex justify-center w-64 h-screen px-8 py-4 bg-gray-900 text-gray-100 rounded-r-md shadow-sm">
-    <div class="text-xl font-semibold">
-         Intnet
+<div class="sidebar min-h-screen p-4 border border-gray-400 shadow-md rounded-r-md">
+
+    <div class="text-center text-2xl font-semibold py-6 text-white">
+        Intnet
+    </div>
+
+    <div *ngFor="let item of sidebarItems" class="flex items-center space-x-6 px-8 py-4">
+        <fa-icon [icon]="item.icon ?? faHome" class="text-lg text-gray-200"></fa-icon>
+        <button 
+            (click)="navigateTo(item)" 
+            class="text-lg font-semibold text-gray-200 hover:text-white"
+            [ngClass]="{
+                
+                'text-white': item?.value === currentRoute
+            }"
+        >
+            {{ item.label }}
+        </button>
     </div>
 </div>
