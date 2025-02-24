@@ -10,8 +10,28 @@
     font-size: 1rem;
     font-weight: 500;
     line-height: 1.3rem;
+    cursor: pointer;
 }
 
 .standard-write-button:hover {
     background-color: rgb(35, 80, 200);
+}
+
+.standard-cancel-button {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    height: 2.5rem;
+    background-color: rgb(247, 247, 247);
+    color: rgb(35, 35, 35);
+    border: 1px solid rgb(221, 221, 221);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.3rem;
+    cursor: pointer;
+}
+
+.standard-cancel-button:hover {
+    background-color: rgb(235, 235, 235);
 }

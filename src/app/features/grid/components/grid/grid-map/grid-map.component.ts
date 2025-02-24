@@ -15,6 +15,8 @@ export class GridMapComponent implements OnInit, OnChanges {
     @Input() nodes?: BusSearchDto[];
     @Input() edges?: EdgeUI[];
     @Input() selectedAddOption?: string;
+    @Input() cancelCreateBusFlag: boolean = false; 
+    @Output() onTempNodeAdded = new EventEmitter<BusSearchDto>();
 
     private map: any;
     private L: any;
@@ -30,14 +32,22 @@ export class GridMapComponent implements OnInit, OnChanges {
     ) {}
 
     ngOnInit(): void {
-
         this.initMap();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        this.renderNodesAndEdges(changes);
+
+        if (changes["cancelCreateBusFlag"]?.currentValue) {
+            
+            this.clearTempNode();
+            this.cancelCreateBusFlag = false;
+        }
+    }
+
+    private renderNodesAndEdges(changes: SimpleChanges): void {
         if (changes["nodes"]?.currentValue) {
             this.nodes = changes["nodes"]?.currentValue;
-            console.log("Nodes", this.nodes);
             this.renderNodes();
 
             if (this.edges && !this.areEdgesRendered) {
@@ -147,15 +157,23 @@ export class GridMapComponent implements OnInit, OnChanges {
 
         switch (this.selectedAddOption) {
             case "bus":
-                if (this.tempNodeMarker) {
-                    this.map.removeLayer(this.tempNodeMarker);
-                    this.tempNodeMarker = undefined;
-                }
-                
+                this.clearTempNode();
+
                 this.tempNode = { id: 0, gridId: 0, latitude: clickedLat, longitude: clickedLng }
                 this.tempNodeMarker = this.addNodeMarker(this.tempNode);
                 this.tempNodeMarker.addTo(this.map);
+
+                this.onTempNodeAdded.emit(this.tempNode);
+
                 break;
+        }
+    }
+
+    clearTempNode(): void {
+        if (this.tempNodeMarker) {
+            console.log("Clearing node");
+            this.map.removeLayer(this.tempNodeMarker);
+            this.tempNodeMarker = undefined;
         }
     }
 }
