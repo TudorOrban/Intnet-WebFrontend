@@ -6,6 +6,8 @@ import { EdgeType, EdgeUI } from '../../../models/Edge';
 import { LeafletMouseEvent } from 'leaflet';
 import { GridInteractionService } from '../../../services/ui/grid-interaction.service';
 import { Subscription } from 'rxjs';
+import { GridRendererService } from '../../../services/ui/grid-renderer.service';
+// import { GridRendererService } from '../../../services/ui/grid-renderer.service';
 
 @Component({
   selector: 'app-grid-map',
@@ -34,16 +36,17 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     private cancelNodeSubscription: Subscription | undefined;
     private cancelEdgeSubscription: Subscription | undefined;
 
-    isMapInitialized: boolean = false;
+    areNodesRendered: boolean = false;
     areEdgesRendered: boolean = false;
 
     constructor(
+        private gridRendererService: GridRendererService,
         private gridInteractionService: GridInteractionService,
         private viewContainerRef: ViewContainerRef,
     ) {}
 
-    ngOnInit(): void {
-        this.initMap();
+    async ngOnInit(): Promise<void> {
+        await this.gridRendererService.initMap("map", this.viewContainerRef, this.handleMapClick.bind(this));
         this.subscribeToParentEvents();
     }
 
@@ -58,7 +61,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
 
     private subscribeToParentEvents(): void {
         this.cancelNodeSubscription = this.gridInteractionService.cancelNodeCreation$.subscribe(() => {
-            this.clearTempNode();
+            this.gridRendererService.removeNodeFromMap(this.tempNodeMarker);
         });
         this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
             this.clearTempEdge(true);
@@ -66,63 +69,25 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private renderNodesAndEdges(changes: SimpleChanges): void {
+        // Account for potential timing issues, as renderEdges depends on nodes
         if (changes["nodes"]?.currentValue) {
-            this.nodes = changes["nodes"]?.currentValue;
-            this.renderNodes();
+            if (!this.areNodesRendered) {
+                this.nodes = changes["nodes"]?.currentValue;
+                this.gridRendererService.renderNodes(this.nodes, this.handleNodeClick.bind(this));
+                this.areNodesRendered = true;
+            }
 
             if (this.edges && !this.areEdgesRendered) {
-                this.renderEdges();
+                this.gridRendererService.renderEdges(this.edges, this.nodes);
+                this.areEdgesRendered = true;
             }
         }
-        if (changes["edges"]?.currentValue) {
+        if (changes["edges"]?.currentValue && !this.areEdgesRendered) {
             this.edges = changes["edges"]?.currentValue;
 
-            this.renderEdges();
+            this.gridRendererService.renderEdges(this.edges, this.nodes);
+            this.areEdgesRendered = true;
         }
-    }
-
-    private async initMap() {
-        this.isMapInitialized = true;
-
-        this.L = await import('leaflet');
-
-        this.map = this.L.map('map', {
-            center: [39.8282, -98.5795],
-            zoom: 8,
-            worldCopyJump: true,
-        });
-
-        // Load tiles
-        const tiles = this.L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-                maxZoom: 20,
-                minZoom: 5,
-                attribution:
-                    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            }
-        );
-
-        tiles.addTo(this.map);
-
-        this.map.on('click', (e: L.LeafletMouseEvent) => {
-            this.handleMapClick(e);
-        });
-    }
-
-    private renderNodes(): void {
-        if (!this.L) {
-            return;
-        }
-
-        this.nodes?.forEach((node, index) => {
-            const marker = this.addNodeMarker(node);
-            marker.addTo(this.map);
-
-            if (index == 0) {
-                this.map.setView([node.latitude, node.longitude], 6); // TODO: Center around whole grid at appropriate zoom level
-            }
-        });
     }
 
     private addNodeMarker(node: NodeUI): L.Marker {
@@ -146,44 +111,6 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         return marker;
     }
 
-    private renderEdges(): void {
-        if (!this.L) {
-            return;
-        }
-
-        this.edges?.forEach(edge => {
-            const determined = this.determineNodeLatLong(edge);
-            if (!determined) {
-                return;
-            }
-
-            const polyline = this.addEdgePolyline(edge);
-            polyline.addTo(this.map);
-
-            this.areEdgesRendered = true;
-        });
-    }
-
-    private determineNodeLatLong(edge: EdgeUI): boolean {
-        const srcNode = (this.nodes ?? []).find(n => n.id === edge.srcBusId);
-        const destNode = (this.nodes ?? []).find(n => n.id === edge.destBusId);
-
-        if (!srcNode?.latitude || !srcNode?.longitude || !destNode?.latitude || !destNode?.longitude) {
-            return false;
-        }
-
-        edge.srcNodeLatLong = [srcNode.latitude, srcNode.longitude];
-        edge.destNodeLatLong = [destNode.latitude, destNode.longitude];
-        return true;
-    }
-
-    private addEdgePolyline(edge: EdgeUI): L.Polyline {
-        return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
-            color: "blue",
-            weight: 3
-        }); 
-    }
-
     // Add Node logic
     private handleMapClick(e: LeafletMouseEvent): void {
         const clickedLat = e.latlng.lat;
@@ -196,21 +123,15 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
                 break;
         }
     }
+
     private handleAddNodeMapClick(clickedLat: number, clickedLng: number): void {
-        this.clearTempNode();
+        this.gridRendererService.removeNodeFromMap(this.tempNodeMarker);
 
         this.tempNode = { id: 0, gridId: 0, latitude: clickedLat, longitude: clickedLng }
-        this.tempNodeMarker = this.addNodeMarker(this.tempNode);
-        this.tempNodeMarker.addTo(this.map);
+        this.tempNodeMarker = this.gridRendererService.addNodeMarker(this.tempNode, this.handleNodeClick.bind(this));
+        this.gridRendererService.addNodeToMap(this.tempNodeMarker);
 
         this.onTempNodeAdded.emit(this.tempNode);
-    }
-
-    clearTempNode(): void {
-        if (this.tempNodeMarker) {
-            this.map.removeLayer(this.tempNodeMarker);
-            this.tempNodeMarker = undefined;
-        }
     }
 
     // Add Edge logic
@@ -253,12 +174,12 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
             }
 
             node.isSelected = true;
-            const determined = this.determineNodeLatLong(this.tempEdge);
+            const determined = this.gridRendererService.determineNodeLatLong(this.tempEdge, this.nodes);
             if (!determined) {
                 return;
             }
 
-            this.tempEdgePolyline = this.addEdgePolyline(this.tempEdge);
+            this.tempEdgePolyline = this.gridRendererService.addEdgePolyline(this.tempEdge);
             this.tempEdgePolyline.addTo(this.map);
 
             this.onTempEdgeAdded.emit(this.tempEdge);
