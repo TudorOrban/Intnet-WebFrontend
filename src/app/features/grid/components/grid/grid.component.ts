@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BusService } from '../../services/bus.service';
 import { SelectedGridService } from '../../../../core/grid/services/selected-grid.service';
@@ -6,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { BusSearchDto, CreateBusDto } from '../../models/Bus';
 import { GridMapComponent } from "./grid-map/grid-map.component";
 import { EdgeService } from '../../services/edge.service';
-import { EdgeSearchDto } from '../../models/Edge';
+import { CreateEdgeDto, EdgeSearchDto, EdgeType, TempEdgeUI } from '../../models/Edge';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDiagramProject, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { UIItem } from '../../../../shared/common/types/Navigation';
@@ -14,7 +15,7 @@ import { gridAddOptions } from '../../config/gridAddOptions';
 
 @Component({
   selector: 'app-grid',
-  imports: [CommonModule, FontAwesomeModule, GridMapComponent],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.css'
 })
@@ -31,7 +32,11 @@ export class GridComponent implements OnInit, OnDestroy {
 
     createBusDto: CreateBusDto = { gridId: -1, latitude: 0, longitude: 0 };
     isCreateBusReady: boolean = false;
-    cancelCreateBusFlag = false;
+    cancelCreateBusFlag: boolean = false;
+
+    createEdgeDto: CreateEdgeDto = { gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.DISTRIBUTION };
+    isCreateEdgeReady: boolean = false;
+    cancelCreateEdgeFlag: boolean = false;
 
     constructor(
         private readonly busService: BusService,
@@ -82,6 +87,7 @@ export class GridComponent implements OnInit, OnDestroy {
         this.selectedAddOption = optionValue;
     }
 
+    // Node
     handleTempNodeAdded(tempNode: BusSearchDto): void {
         if (!this.gridId) {
             console.error("No Grid selected");
@@ -110,6 +116,37 @@ export class GridComponent implements OnInit, OnDestroy {
         this.selectedAddOption = undefined;
         this.isCreateBusReady = false;
         this.cancelCreateBusFlag = true;
+    }
+
+    // Edge
+    handleTempEdgeAdded(tempEdge: TempEdgeUI): void {
+        if (!this.gridId) {
+            console.error("No Grid selected");
+            return;
+        }
+
+        this.createEdgeDto.gridId = this.gridId;
+        this.createEdgeDto.srcBusId = tempEdge.srcBusId ?? 0;
+        this.createEdgeDto.destBusId = tempEdge.destBusId ?? 0;
+        
+        this.isCreateEdgeReady = true;
+    }
+
+    handleConfirmAddEdge(): void {
+        this.edgeService.createEdge(this.createEdgeDto).subscribe(
+            (data) => {
+                console.log("Edge created successfuly: ", data);
+            },
+            (error) => {
+                console.error("Error creating edge:", error);
+            }
+        );
+    }
+
+    handleCancelAddEdge(): void {
+        this.selectedAddOption = undefined;
+        this.isCreateEdgeReady = false;
+        this.cancelCreateEdgeFlag = true;
     }
 
     faPlus = faPlus;

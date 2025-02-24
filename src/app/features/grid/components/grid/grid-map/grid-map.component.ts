@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ComponentRef, EmbeddedViewRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { BusSearchDto } from '../../../models/Bus';
 import { NodeComponent } from './node/node.component';
-import { EdgeUI } from '../../../models/Edge';
+import { EdgeSearchDto, EdgeUI, TempEdgeUI } from '../../../models/Edge';
 import { LeafletMouseEvent } from 'leaflet';
 
 @Component({
@@ -16,13 +16,17 @@ export class GridMapComponent implements OnInit, OnChanges {
     @Input() edges?: EdgeUI[];
     @Input() selectedAddOption?: string;
     @Input() cancelCreateBusFlag: boolean = false; 
+    @Input() cancelCreateEdgeFlag: boolean = false;
     @Output() onTempNodeAdded = new EventEmitter<BusSearchDto>();
+    @Output() onTempEdgeAdded = new EventEmitter<TempEdgeUI>();
 
     private map: any;
     private L: any;
 
     private tempNodeMarker?: L.Marker;
     private tempNode?: BusSearchDto;
+    private tempEdgePolyline?: L.Polyline;
+    private tempEdge?: TempEdgeUI;
 
     isMapInitialized: boolean = false;
     areEdgesRendered: boolean = false;
@@ -139,39 +143,59 @@ export class GridMapComponent implements OnInit, OnChanges {
             edge.srcNodeLatLong = [srcNode.latitude, srcNode.longitude];
             edge.destNodeLatLong = [destNode.latitude, destNode.longitude];
             
-            this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
-                color: "blue",
-                weight: 3
-            }).addTo(this.map);
+            const polyline = this.addEdgePolyline(edge);
+            polyline.addTo(this.map);
 
             this.areEdgesRendered = true;
         });
     }
 
-    handleMapClick(e: LeafletMouseEvent): void {
+    private addEdgePolyline(edge: EdgeUI): L.Polyline {
+        return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
+            color: "blue",
+            weight: 3
+        }); 
+    }
+
+    private handleMapClick(e: LeafletMouseEvent): void {
         const clickedLat = e.latlng.lat;
         const clickedLng = e.latlng.lng;
-        console.log(
-            `Latitude: ${clickedLat}, Longitude: ${clickedLng}`
-        );
+        console.log(`Latitude: ${clickedLat}, Longitude: ${clickedLng}`);
 
         switch (this.selectedAddOption) {
             case "bus":
-                this.clearTempNode();
-
-                this.tempNode = { id: 0, gridId: 0, latitude: clickedLat, longitude: clickedLng }
-                this.tempNodeMarker = this.addNodeMarker(this.tempNode);
-                this.tempNodeMarker.addTo(this.map);
-
-                this.onTempNodeAdded.emit(this.tempNode);
-
+                this.handleAddNodeMapClick(clickedLat, clickedLng);
                 break;
+            case "edge":
+
+            
         }
+    }
+
+    private handleAddNodeMapClick(clickedLat: number, clickedLng: number): void {
+        this.clearTempNode();
+
+        this.tempNode = { id: 0, gridId: 0, latitude: clickedLat, longitude: clickedLng }
+        this.tempNodeMarker = this.addNodeMarker(this.tempNode);
+        this.tempNodeMarker.addTo(this.map);
+
+        this.onTempNodeAdded.emit(this.tempNode);
+    }
+
+    private handleAddEdgeMapClick(clickedLat: number, clickedLng: number): void {
+        const minimumDistFromNode = 20;
+
+
+    }
+
+    private getDistance(srcLat: number, srcLng: number, destLat: number, destLng: number): number {
+        const deltaLat = destLat - srcLat;
+        const deltaLng = destLng - srcLng;
+        return Math.sqrt(deltaLat * deltaLat + deltaLng * deltaLng);
     }
 
     clearTempNode(): void {
         if (this.tempNodeMarker) {
-            console.log("Clearing node");
             this.map.removeLayer(this.tempNodeMarker);
             this.tempNodeMarker = undefined;
         }
