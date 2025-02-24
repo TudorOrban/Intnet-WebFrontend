@@ -46,7 +46,7 @@ export class GridComponent implements OnInit, OnDestroy {
     constructor(
         private readonly busService: BusService,
         private readonly edgeService: EdgeService,
-        private readonly gridInteractionService: GridMapCommunicatorService,
+        private readonly gridMapCommunicatorService: GridMapCommunicatorService,
         private readonly selectedGridService: SelectedGridService,
     ) {}
 
@@ -109,7 +109,9 @@ export class GridComponent implements OnInit, OnDestroy {
     handleConfirmAddNode(): void {
         this.busService.createBus(this.createBusDto).subscribe(
             (data) => {
-                console.log("Bus created successfuly: ", data);
+                this.selectedAddOption = undefined;
+                this.isCreateBusReady = false;
+                this.gridMapCommunicatorService.successNodeCreation(data);
             },
             (error) => {
                 console.error("Error creating bus:", error);
@@ -120,7 +122,7 @@ export class GridComponent implements OnInit, OnDestroy {
     handleCancelAddNode(): void {
         this.selectedAddOption = undefined;
         this.isCreateBusReady = false;
-        this.gridInteractionService.cancelNodeCreation();
+        this.gridMapCommunicatorService.cancelNodeCreation();
     }
 
     // Edge
@@ -140,7 +142,9 @@ export class GridComponent implements OnInit, OnDestroy {
     handleConfirmAddEdge(): void {
         this.edgeService.createEdge(this.createEdgeDto).subscribe(
             (data) => {
-                console.log("Edge created successfuly: ", data);
+                this.selectedAddOption = undefined;
+                this.isCreateEdgeReady = false;
+                this.gridMapCommunicatorService.successEdgeCreation(data);
             },
             (error) => {
                 console.error("Error creating edge:", error);
@@ -151,7 +155,7 @@ export class GridComponent implements OnInit, OnDestroy {
     handleCancelAddEdge(): void {
         this.selectedAddOption = undefined;
         this.isCreateEdgeReady = false;
-        this.gridInteractionService.cancelEdgeCreation();
+        this.gridMapCommunicatorService.cancelEdgeCreation();
     }
 
     handleEdgeTypeSelected(value: string): void {

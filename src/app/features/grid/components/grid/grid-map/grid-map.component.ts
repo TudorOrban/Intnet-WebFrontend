@@ -20,7 +20,9 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     @Output() onTempNodeAdded = new EventEmitter<NodeUI>();
     @Output() onTempEdgeAdded = new EventEmitter<EdgeUI>();
 
+    private successNodeSubscription: Subscription | undefined;
     private cancelNodeSubscription: Subscription | undefined;
+    private successEdgeSubscription: Subscription | undefined;
     private cancelEdgeSubscription: Subscription | undefined;
 
     areNodesRendered: boolean = false;
@@ -51,18 +53,26 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
             this.renderEdges();
         }
         if (changes["selectedAddOption"] && changes["selectedAddOption"].currentValue !== changes["selectedAddOption"].previousValue) {
-            this.gridEditorService.selectedAddOption = changes["selectedAddOption"].currentValue;
+            this.gridEditorService.setSelectedAddOption(changes["selectedAddOption"].currentValue);
         }
     }
 
     ngOnDestroy(): void {
+        this.successNodeSubscription?.unsubscribe();
         this.cancelNodeSubscription?.unsubscribe();
+        this.successEdgeSubscription?.unsubscribe();
         this.cancelEdgeSubscription?.unsubscribe();
     }
 
     private subscribeToEvents(): void {
+        this.successNodeSubscription = this.gridInteractionService.successNodeCreation$.subscribe((createdNode) => {
+            this.gridEditorService.makeTempNodePermanent(createdNode, this.nodes);
+        });
         this.cancelNodeSubscription = this.gridInteractionService.cancelNodeCreation$.subscribe(() => {
-            this.gridRendererService.removeNodeFromMap(this.gridEditorService.getTempNodeMarker());
+            this.gridEditorService.clearTempNode();
+        });
+        this.successEdgeSubscription = this.gridInteractionService.successEdgeCreation$.subscribe((createdEdge) => {
+            this.gridEditorService.makeTempEdgePermanent(createdEdge, this.nodes);
         });
         this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
             this.gridEditorService.clearTempEdge(true, this.nodes);
@@ -75,7 +85,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
             this.onTempEdgeAdded.emit(tempEdge);
         });
     }
-    
+
     private renderNodes(): void {
         if (!this.nodes || this.areNodesRendered) {
             return;
