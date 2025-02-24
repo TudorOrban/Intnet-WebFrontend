@@ -1,3 +1,9 @@
-<div class="w-6 h-6 rounded-full node">
-
-</div>
+<button 
+    (click)="clickNode()"
+    class="w-6 h-6 rounded-full node" 
+    [ngClass]="{
+        'node-selected': node?.isSelected,
+        'node-temporary': node?.isTemporary
+    }"
+>
+</button>

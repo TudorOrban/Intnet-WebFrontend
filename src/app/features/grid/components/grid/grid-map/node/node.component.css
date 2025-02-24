@@ -2,3 +2,13 @@
     background-color: rgb(12, 37, 163);
     border: 1px solid rgb(64, 64, 64);
 }
+
+.node-selected {
+    background-color: lightblue;
+    border: 2px solid blue;
+  }
+  
+  .node-temporary {
+    background-color: lightgray;
+    border: 1px dashed gray;
+  }

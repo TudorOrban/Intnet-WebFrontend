@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ComponentRef, EmbeddedViewRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
-import { BusSearchDto } from '../../../models/Bus';
+import { Component, EmbeddedViewRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { NodeUI } from '../../../models/Bus';
 import { NodeComponent } from './node/node.component';
-import { EdgeSearchDto, EdgeUI, TempEdgeUI } from '../../../models/Edge';
+import { EdgeType, EdgeUI } from '../../../models/Edge';
 import { LeafletMouseEvent } from 'leaflet';
 
 @Component({
@@ -12,21 +12,23 @@ import { LeafletMouseEvent } from 'leaflet';
   styleUrl: './grid-map.component.css'
 })
 export class GridMapComponent implements OnInit, OnChanges {
-    @Input() nodes?: BusSearchDto[];
+    @Input() nodes?: NodeUI[];
     @Input() edges?: EdgeUI[];
     @Input() selectedAddOption?: string;
     @Input() cancelCreateBusFlag: boolean = false; 
     @Input() cancelCreateEdgeFlag: boolean = false;
-    @Output() onTempNodeAdded = new EventEmitter<BusSearchDto>();
-    @Output() onTempEdgeAdded = new EventEmitter<TempEdgeUI>();
+    @Output() onTempNodeAdded = new EventEmitter<NodeUI>();
+    @Output() onTempEdgeAdded = new EventEmitter<EdgeUI>();
 
     private map: any;
     private L: any;
 
     private tempNodeMarker?: L.Marker;
-    private tempNode?: BusSearchDto;
+    private tempNode?: NodeUI;
     private tempEdgePolyline?: L.Polyline;
-    private tempEdge?: TempEdgeUI;
+    private tempEdge: EdgeUI = { id: -1, gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.DISTRIBUTION };
+    private tempSrcNodeId?: number;
+    private tempDestNodeId?: number;
 
     isMapInitialized: boolean = false;
     areEdgesRendered: boolean = false;
@@ -109,9 +111,12 @@ export class GridMapComponent implements OnInit, OnChanges {
         });
     }
 
-    private addNodeMarker(node: BusSearchDto): L.Marker {
+    private addNodeMarker(node: NodeUI): L.Marker {
         const componentRef = this.viewContainerRef.createComponent(NodeComponent);
         componentRef.instance.node = node;
+        componentRef.instance.nodeClicked.subscribe((clickedNode: NodeUI) => {
+            this.handleNodeComponentClick(clickedNode);
+        });
 
         const domElement = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
 
@@ -133,21 +138,29 @@ export class GridMapComponent implements OnInit, OnChanges {
         }
 
         this.edges?.forEach(edge => {
-            const srcNode = (this.nodes ?? []).find(n => n.id === edge.srcBusId);
-            const destNode = (this.nodes ?? []).find(n => n.id === edge.destBusId);
-
-            if (!srcNode?.latitude || !srcNode?.longitude || !destNode?.latitude || !destNode?.longitude) {
+            const determined = this.determineNodeLatLong(edge);
+            if (!determined) {
                 return;
             }
 
-            edge.srcNodeLatLong = [srcNode.latitude, srcNode.longitude];
-            edge.destNodeLatLong = [destNode.latitude, destNode.longitude];
-            
             const polyline = this.addEdgePolyline(edge);
             polyline.addTo(this.map);
 
             this.areEdgesRendered = true;
         });
+    }
+
+    private determineNodeLatLong(edge: EdgeUI): boolean {
+        const srcNode = (this.nodes ?? []).find(n => n.id === edge.srcBusId);
+        const destNode = (this.nodes ?? []).find(n => n.id === edge.destBusId);
+
+        if (!srcNode?.latitude || !srcNode?.longitude || !destNode?.latitude || !destNode?.longitude) {
+            return false;
+        }
+
+        edge.srcNodeLatLong = [srcNode.latitude, srcNode.longitude];
+        edge.destNodeLatLong = [destNode.latitude, destNode.longitude];
+        return true;
     }
 
     private addEdgePolyline(edge: EdgeUI): L.Polyline {
@@ -157,6 +170,7 @@ export class GridMapComponent implements OnInit, OnChanges {
         }); 
     }
 
+    // Add Node logic
     private handleMapClick(e: LeafletMouseEvent): void {
         const clickedLat = e.latlng.lat;
         const clickedLng = e.latlng.lng;
@@ -166,12 +180,8 @@ export class GridMapComponent implements OnInit, OnChanges {
             case "bus":
                 this.handleAddNodeMapClick(clickedLat, clickedLng);
                 break;
-            case "edge":
-
-            
         }
     }
-
     private handleAddNodeMapClick(clickedLat: number, clickedLng: number): void {
         this.clearTempNode();
 
@@ -182,22 +192,51 @@ export class GridMapComponent implements OnInit, OnChanges {
         this.onTempNodeAdded.emit(this.tempNode);
     }
 
-    private handleAddEdgeMapClick(clickedLat: number, clickedLng: number): void {
-        const minimumDistFromNode = 20;
-
-
-    }
-
-    private getDistance(srcLat: number, srcLng: number, destLat: number, destLng: number): number {
-        const deltaLat = destLat - srcLat;
-        const deltaLng = destLng - srcLng;
-        return Math.sqrt(deltaLat * deltaLat + deltaLng * deltaLng);
-    }
-
     clearTempNode(): void {
         if (this.tempNodeMarker) {
             this.map.removeLayer(this.tempNodeMarker);
             this.tempNodeMarker = undefined;
         }
     }
+
+    // Add Edge logic
+    handleNodeComponentClick(bus: NodeUI): void {
+        if (this.selectedAddOption !== "edge") {
+            return;
+        }
+
+        if (!this.tempSrcNodeId) {
+            this.tempSrcNodeId = bus.id;
+            this.tempEdge.srcBusId = bus.id;
+
+            this.nodes?.forEach((node) => {
+                if (node.id === bus.id) {
+                    node.isSelected = true;
+                    return;
+                }
+            });
+            return;
+        }
+        
+        if (!this.tempDestNodeId) {
+            this.tempDestNodeId = bus.id;
+            this.tempEdge.destBusId = bus.id;
+
+            this.nodes?.forEach((node) => {
+                if (node.id === bus.id) {
+                    node.isSelected = true;
+                    const determined = this.determineNodeLatLong(this.tempEdge);
+                    if (!determined) {
+                        return;
+                    }
+
+                    this.tempEdgePolyline = this.addEdgePolyline(this.tempEdge);
+                    this.tempEdgePolyline.addTo(this.map);
+                    return;
+                }
+            });
+            return;
+        }
+    }
+
 }

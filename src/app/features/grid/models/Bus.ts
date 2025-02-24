@@ -42,3 +42,9 @@ export interface BusStateDto {
     shuntCapacitatorReactoStatus?: boolean;
     phaseShiftingTransformerTapPosition?: number;
 }
+
+// UI
+export interface NodeUI extends BusSearchDto {
+    isSelected?: boolean;
+    isTemporary?: boolean;
+}

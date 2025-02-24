@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { BusSearchDto } from '../../../../models/Bus';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { NodeUI } from '../../../../models/Bus';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,6 +9,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './node.component.css'
 })
 export class NodeComponent {
-    @Input() node?: BusSearchDto;
+    @Input() node?: NodeUI;
+    @Output() nodeClicked = new EventEmitter<NodeUI>();
 
+    clickNode(): void {
+        this.nodeClicked.emit(this.node);
+    }
 }
