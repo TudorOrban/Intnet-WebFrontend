@@ -14,7 +14,7 @@ export class GridEditorService {
     private tempNodeMarker?: L.Marker;
     private tempNode?: NodeUI;
     private tempEdgePolyline?: L.Polyline;
-    private tempEdge: EdgeUI = { id: -1, gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.DISTRIBUTION };
+    private tempEdge: EdgeUI = { id: -1, gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.TRANSMISSION };
     private tempSrcNodeId?: number;
     private tempDestNodeId?: number;
 

@@ -3,7 +3,8 @@
     class="w-5 h-5 rounded-full node" 
     [ngClass]="{
         'node-selected': node?.isSelected,
-        'node-temporary': node?.isTemporary
+        'node-temporary': node?.isTemporary,
+        'node-distribution': node?.isDistributionNode
     }"
 >
 </button>

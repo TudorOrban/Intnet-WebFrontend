@@ -9,6 +9,11 @@
 }
   
 .node-temporary {
-    background-color: lightgray;
-    border: 1px dashed gray;
+    background-color: rgb(123, 149, 209);
+    border: 1px solid rgb(64, 64, 64);
+}
+ 
+.node-distribution {
+    background-color: rgb(46, 231, 102);
+    border: 1px solid rgb(21, 21, 21);
 }

@@ -47,4 +47,5 @@ export interface BusStateDto {
 export interface NodeUI extends BusSearchDto {
     isSelected?: boolean;
     isTemporary?: boolean;
+    isDistributionNode?: boolean;
 }

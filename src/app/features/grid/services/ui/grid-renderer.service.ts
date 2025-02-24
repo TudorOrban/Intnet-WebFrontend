@@ -13,11 +13,15 @@ export class GridRendererService {
     private L: any;
     private viewContainerRef: ViewContainerRef | undefined;
 
+    private readonly MAP_CENTER: L.LatLngExpression = [39.8282, -98.5795];
+    private readonly MAP_CURRENT_ZOOM: number = 6;
+    private readonly MAP_MIN_ZOOM: number = 4;
+    private readonly MAP_MAX_ZOOM: number = 20;
+
     constructor(
         private readonly gridStateService: GridStateService,
         private readonly gridEventService: GridEventService
-    ) {
-    }
+    ) {}
 
     async initMap(
         mapElementId: string, 
@@ -28,14 +32,14 @@ export class GridRendererService {
         this.viewContainerRef = viewContainerRef;
 
         this.map = this.L.map(mapElementId, {
-            center: [39.8282, -98.5795],
-            zoom: 8,
+            center: this.MAP_CENTER,
+            zoom: this.MAP_CURRENT_ZOOM,
             worldCopyJump: true,
         });
 
         this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 20,
-            minZoom: 5,
+            minZoom: this.MAP_MIN_ZOOM,
+            maxZoom: this.MAP_MAX_ZOOM,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(this.map);
 
@@ -53,21 +57,39 @@ export class GridRendererService {
         if (!this.L || !this.map) return;
 
         const nodes = this.gridStateService.nodes;
-        nodes?.forEach((node, index) => {
+        nodes.forEach((node, index) => {
+            node.isDistributionNode = this.isDistributionNode(node);
+
             const marker = this.buildNodeMarker(node);
             marker.addTo(this.map!);
 
             if (index === 0) {
-                this.map!.setView([node.latitude, node.longitude], 6);
+                this.map!.setView([node.latitude, node.longitude], this.MAP_CURRENT_ZOOM);
             }
         });
+    }
+
+    private isDistributionNode(node: NodeUI): boolean {
+        let isDistributionNode = true;
+        
+        const edges = this.gridStateService.edges;
+        edges.forEach((edge) => {
+            const isAdjacentEdgeTransmission = 
+                (edge.srcBusId === node.id || edge.destBusId === node.id) && edge.edgeType === EdgeType.TRANSMISSION
+            if (isAdjacentEdgeTransmission) {
+                isDistributionNode = false;
+                return;
+            }
+        });
+
+        return isDistributionNode;
     }
 
     private renderEdges(): void {
         if (!this.L || !this.map) return;
 
         const edges = this.gridStateService.edges;
-        edges?.forEach((edge) => {
+        edges.forEach((edge) => {
             const determined = this.determineNodeLatLong(edge);
             if (!determined) return;
 
@@ -114,10 +136,9 @@ export class GridRendererService {
     }
 
     buildEdgePolyline(edge: EdgeUI): L.Polyline {
-        console.log("Edgetype", edge.edgeType);
         return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
             color: edge.edgeType === EdgeType.TRANSMISSION ? "blue" : "green",
-            weight: edge.edgeType === EdgeType.TRANSMISSION ? 4 : 2,
+            weight: edge.edgeType === EdgeType.TRANSMISSION ? 3 : 2,
         });
     }
 
