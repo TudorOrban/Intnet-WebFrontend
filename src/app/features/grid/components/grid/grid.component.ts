@@ -8,7 +8,7 @@ import { GridMapComponent } from "./grid-map/grid-map.component";
 import { EdgeService } from '../../services/edge.service';
 import { EdgeSearchDto } from '../../models/Edge';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCodeCommit, faCodeMerge, faDiagramProject, faIndustry, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faBatteryHalf, faCodeCommit, faCodeMerge, faDiagramProject, faIndustry, faPlug, faPlus, faQuestion, faSolarPanel } from '@fortawesome/free-solid-svg-icons';
 import { UIItem } from '../../../../shared/common/types/Navigation';
 
 @Component({
@@ -24,7 +24,7 @@ export class GridComponent implements OnInit, OnDestroy {
     buses?: BusSearchDto[];
     edges?: EdgeSearchDto[];
 
-    isAddMenuOpen: boolean = false;
+    isAddMenuOpen: boolean = true;
     addOptions: UIItem[] = [
         {
             label: "Bus",
@@ -40,8 +40,24 @@ export class GridComponent implements OnInit, OnDestroy {
             label: "Generator",
             value: "generator",
             icon: faIndustry
-        }
+        },
+        {
+            label: "DER",
+            value: "load",
+            icon: faPlug
+        },
+        {
+            label: "DER",
+            value: "der",
+            icon: faSolarPanel
+        },
+        {
+            label: "Storage",
+            value: "storage",
+            icon: faBatteryHalf
+        },
     ];
+    selectedAddOption?: string;
 
     constructor(
         private readonly busService: BusService,
@@ -78,6 +94,10 @@ export class GridComponent implements OnInit, OnDestroy {
 
     toggleAddMenu(): void {
         this.isAddMenuOpen = !this.isAddMenuOpen;
+    }
+
+    selectAddOption(optionValue: string) {
+        this.selectedAddOption = optionValue;
     }
 
     faPlus = faPlus;

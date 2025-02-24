@@ -17,19 +17,27 @@
         </div>
     </div>
 
-    <div *ngIf="isAddMenuOpen" class="flex items-center justify-between flex-wrap w-full px-4 pb-4">
-        <div *ngFor="let option of addOptions" class="flex items-center space-x-2">
+    <div *ngIf="isAddMenuOpen" class="flex items-center space-x-12 flex-wrap w-full px-4 pb-4">
+        <button 
+            *ngFor="let option of addOptions" 
+            (click)="selectAddOption(option.value)"
+            class="flex items-center space-x-2 cursor-pointer" 
+            [ngClass]="{
+                'text-blue-600': option.value === selectedAddOption
+            }"
+        >
             <fa-icon [icon]="option?.icon ?? faQuestion"></fa-icon>
             <div class="text-lg font-semibold">
                 {{ option?.label }}
             </div>
-        </div>
+        </button>
     </div>
 
     <div class="border border-gray-400">
         <app-grid-map
             [nodes]="buses"
             [edges]="edges"
+            [selectedAddOption]="selectedAddOption"
         ></app-grid-map>
     </div>
 
