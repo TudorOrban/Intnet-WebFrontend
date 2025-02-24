@@ -1,22 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BusService } from '../../services/bus.service';
+import { BusService } from '../../services/api/bus.service';
 import { SelectedGridService } from '../../../../core/grid/services/selected-grid.service';
 import { Subscription } from 'rxjs';
 import { BusSearchDto, CreateBusDto } from '../../models/Bus';
 import { GridMapComponent } from "./grid-map/grid-map.component";
-import { EdgeService } from '../../services/edge.service';
+import { EdgeService } from '../../services/api/edge.service';
 import { CreateEdgeDto, EdgeSearchDto, EdgeType, TempEdgeUI } from '../../models/Edge';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDiagramProject, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { UIItem } from '../../../../shared/common/types/Navigation';
 import { gridAddOptions } from '../../config/gridAddOptions';
-import { GridInteractionService } from '../../services/grid-interaction.service';
+import { GridInteractionService } from '../../services/ui/grid-interaction.service';
+import { SelectComponent } from "../../../../shared/common/components/select/select.component";
 
 @Component({
   selector: 'app-grid',
-  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent, SelectComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.css'
 })
@@ -34,8 +35,13 @@ export class GridComponent implements OnInit, OnDestroy {
     createBusDto: CreateBusDto = { gridId: -1, latitude: 0, longitude: 0 };
     isCreateBusReady: boolean = false;
 
-    createEdgeDto: CreateEdgeDto = { gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.DISTRIBUTION };
+    createEdgeDto: CreateEdgeDto = { gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.TRANSMISSION };
     isCreateEdgeReady: boolean = false;
+    edgeTypeOptions: UIItem[] = [
+        { label: "Transmission Line", value: "TRANSMISSION", },
+        { label: "Distribution Line", value: "DISTRIBUTION", },
+        { label: "Transformer", value: "TRANSFORMER", },
+    ];
 
     constructor(
         private readonly busService: BusService,
@@ -73,7 +79,6 @@ export class GridComponent implements OnInit, OnDestroy {
         );
         this.edgeService.getEdgesByGridId(this.gridId).subscribe(
             (data) => {
-                console.log("Data", data);
                 this.edges = data;
             }
         );
@@ -147,6 +152,11 @@ export class GridComponent implements OnInit, OnDestroy {
         this.selectedAddOption = undefined;
         this.isCreateEdgeReady = false;
         this.gridInteractionService.cancelEdgeCreation();
+    }
+
+    handleEdgeTypeSelected(value: string): void {
+        const edgeType = EdgeType[value as keyof typeof EdgeType];
+        this.createEdgeDto.edgeType = edgeType;
     }
 
     faPlus = faPlus;

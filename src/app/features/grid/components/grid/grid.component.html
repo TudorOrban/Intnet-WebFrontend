@@ -57,6 +57,11 @@
             placeholder="Edge Name"
             class="w-60 h-10 px-4 border border-gray-300 rounded-md shadow-sm"
         />
+        <app-select
+            [items]="edgeTypeOptions"
+            (onItemSelected)="handleEdgeTypeSelected($event)"
+        >
+        </app-select>
         <div class="flex items-center space-x-2">
             <button class="standard-write-button" (click)="handleConfirmAddEdge()">
                 Confirm

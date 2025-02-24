@@ -1,14 +1,14 @@
 .node {
     background-color: rgb(12, 37, 163);
-    border: 1px solid rgb(64, 64, 64);
+    border: 1px solid rgb(21, 21, 21);
 }
 
 .node-selected {
-    background-color: lightblue;
-    border: 2px solid blue;
-  }
+    background-color: rgb(46, 102, 231);
+    border: 2px solid rgb(64, 64, 64);
+}
   
-  .node-temporary {
+.node-temporary {
     background-color: lightgray;
     border: 1px dashed gray;
-  }
+}

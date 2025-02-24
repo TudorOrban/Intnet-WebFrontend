@@ -4,7 +4,7 @@ import { NodeUI } from '../../../models/Bus';
 import { NodeComponent } from './node/node.component';
 import { EdgeType, EdgeUI } from '../../../models/Edge';
 import { LeafletMouseEvent } from 'leaflet';
-import { GridInteractionService } from '../../../services/grid-interaction.service';
+import { GridInteractionService } from '../../../services/ui/grid-interaction.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -137,9 +137,9 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         const marker = this.L.marker([node.latitude, node.longitude], {
             icon: this.L.divIcon({
                 html: domElement,
-                class: "flex items-center justify-center w-6 h-6",
+                class: "flex items-center justify-center w-5 h-5",
                 className: "div-icon-custom",
-                iconSize: [20, 20]
+                iconSize: [16, 16]
             }),
         });
 
