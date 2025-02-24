@@ -17,7 +17,7 @@ export const gridAddOptions = [
         icon: faIndustry
     },
     {
-        label: "DER",
+        label: "Load",
         value: "load",
         icon: faPlug
     },

@@ -12,6 +12,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDiagramProject, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { UIItem } from '../../../../shared/common/types/Navigation';
 import { gridAddOptions } from '../../config/gridAddOptions';
+import { GridInteractionService } from '../../services/grid-interaction.service';
 
 @Component({
   selector: 'app-grid',
@@ -32,16 +33,15 @@ export class GridComponent implements OnInit, OnDestroy {
 
     createBusDto: CreateBusDto = { gridId: -1, latitude: 0, longitude: 0 };
     isCreateBusReady: boolean = false;
-    cancelCreateBusFlag: boolean = false;
 
     createEdgeDto: CreateEdgeDto = { gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.DISTRIBUTION };
     isCreateEdgeReady: boolean = false;
-    cancelCreateEdgeFlag: boolean = false;
 
     constructor(
         private readonly busService: BusService,
         private readonly edgeService: EdgeService,
-        private readonly selectedGridService: SelectedGridService
+        private readonly gridInteractionService: GridInteractionService,
+        private readonly selectedGridService: SelectedGridService,
     ) {}
 
     ngOnInit(): void {
@@ -115,7 +115,7 @@ export class GridComponent implements OnInit, OnDestroy {
     handleCancelAddNode(): void {
         this.selectedAddOption = undefined;
         this.isCreateBusReady = false;
-        this.cancelCreateBusFlag = true;
+        this.gridInteractionService.cancelNodeCreation();
     }
 
     // Edge
@@ -146,7 +146,7 @@ export class GridComponent implements OnInit, OnDestroy {
     handleCancelAddEdge(): void {
         this.selectedAddOption = undefined;
         this.isCreateEdgeReady = false;
-        this.cancelCreateEdgeFlag = true;
+        this.gridInteractionService.cancelEdgeCreation();
     }
 
     faPlus = faPlus;
