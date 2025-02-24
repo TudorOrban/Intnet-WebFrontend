@@ -1,7 +1,9 @@
 import { EmbeddedViewRef, Injectable, SimpleChanges, ViewContainerRef } from "@angular/core";
 import { NodeUI } from "../../models/Bus";
 import { NodeComponent } from "../../components/grid/grid-map/node/node.component";
-import { EdgeUI } from "../../models/Edge";
+import { EdgeType, EdgeUI } from "../../models/Edge";
+import { GridStateService } from "./grid-state.service";
+import { GridEventService } from "./grid-event.service";
 
 @Injectable({
     providedIn: "root"
@@ -10,6 +12,12 @@ export class GridRendererService {
     private map: L.Map | undefined;
     private L: any;
     private viewContainerRef: ViewContainerRef | undefined;
+
+    constructor(
+        private readonly gridStateService: GridStateService,
+        private readonly gridEventService: GridEventService
+    ) {
+    }
 
     async initMap(
         mapElementId: string, 
@@ -36,14 +44,17 @@ export class GridRendererService {
         });
     }
 
-    renderNodes(
-        nodes?: NodeUI[],
-        handleNodeClick?: (clickedNode: NodeUI) => void
-    ): void {
+    renderGraph(): void {
+        this.renderNodes();
+        this.renderEdges();
+    }
+
+    private renderNodes(): void {
         if (!this.L || !this.map) return;
 
+        const nodes = this.gridStateService.nodes;
         nodes?.forEach((node, index) => {
-            const marker = this.buildNodeMarker(node, handleNodeClick);
+            const marker = this.buildNodeMarker(node);
             marker.addTo(this.map!);
 
             if (index === 0) {
@@ -52,11 +63,12 @@ export class GridRendererService {
         });
     }
 
-    renderEdges(edges?: EdgeUI[], nodes?: NodeUI[]): void {
+    private renderEdges(): void {
         if (!this.L || !this.map) return;
 
+        const edges = this.gridStateService.edges;
         edges?.forEach((edge) => {
-            const determined = this.determineNodeLatLong(edge, nodes);
+            const determined = this.determineNodeLatLong(edge);
             if (!determined) return;
 
             const polyline = this.buildEdgePolyline(edge);
@@ -64,10 +76,7 @@ export class GridRendererService {
         });
     }
 
-    buildNodeMarker(
-        node: NodeUI, 
-        handleNodeClick?: (clickedNode: NodeUI) => void
-    ): L.Marker {
+    buildNodeMarker(node: NodeUI): L.Marker {
         if (!this.viewContainerRef) {
             throw new Error('ViewContainerRef is not available.');
         }
@@ -75,7 +84,7 @@ export class GridRendererService {
         const componentRef = this.viewContainerRef.createComponent(NodeComponent);
         componentRef.instance.node = node;
         componentRef.instance.nodeClicked.subscribe((clickedNode: NodeUI) => {
-            handleNodeClick?.(clickedNode);
+            this.gridEventService.publishNodeClicked(clickedNode);
         });
 
         const domElement = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
@@ -90,7 +99,8 @@ export class GridRendererService {
         });
     }
 
-    determineNodeLatLong(edge: EdgeUI, nodes?: NodeUI[]): boolean {
+    determineNodeLatLong(edge: EdgeUI): boolean {
+        const nodes = this.gridStateService.nodes;
         const srcNode = nodes?.find((n) => n.id === edge.srcBusId);
         const destNode = nodes?.find((n) => n.id === edge.destBusId);
 
@@ -104,9 +114,10 @@ export class GridRendererService {
     }
 
     buildEdgePolyline(edge: EdgeUI): L.Polyline {
+        console.log("Edgetype", edge.edgeType);
         return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
-            color: 'blue',
-            weight: 3,
+            color: edge.edgeType === EdgeType.TRANSMISSION ? "blue" : "green",
+            weight: edge.edgeType === EdgeType.TRANSMISSION ? 4 : 2,
         });
     }
 

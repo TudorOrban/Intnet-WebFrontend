@@ -51,9 +51,9 @@ export interface UpdateEdgeDto {
 }
 
 export enum EdgeType {
-    TRANSMISSION,
-    DISTRIBUTION,
-    TRANSFORMER
+    TRANSMISSION = "TRANSMISSION",
+    DISTRIBUTION = "DISTRIBUTION",
+    TRANSFORMER = "TRANSFORMER"
 }
 
 // UI

@@ -6,6 +6,7 @@ import { GridMapCommunicatorService } from '../../../services/ui/grid-interactio
 import { Subscription } from 'rxjs';
 import { GridRendererService } from '../../../services/ui/grid-renderer.service';
 import { GridEditorService } from '../../../services/ui/grid-editor.service';
+import { GridStateService } from '../../../services/ui/grid-state.service';
 
 @Component({
   selector: 'app-grid-map',
@@ -25,14 +26,14 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     private successEdgeSubscription: Subscription | undefined;
     private cancelEdgeSubscription: Subscription | undefined;
 
-    areNodesRendered: boolean = false;
-    areEdgesRendered: boolean = false;
+    isGraphRendered: boolean = false;
 
     constructor(
-        private gridRendererService: GridRendererService,
-        private gridEditorService: GridEditorService,
-        private gridInteractionService: GridMapCommunicatorService,
-        private viewContainerRef: ViewContainerRef,
+        private readonly gridStateService: GridStateService,
+        private readonly gridRendererService: GridRendererService,
+        private readonly gridEditorService: GridEditorService,
+        private readonly gridInteractionService: GridMapCommunicatorService,
+        private readonly viewContainerRef: ViewContainerRef
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -47,10 +48,12 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes["nodes"]?.currentValue) {
-            this.renderNodes();
+            this.gridStateService.setNodes(changes["nodes"].currentValue);
+            this.renderGridGraph();
         }
         if (changes["edges"]?.currentValue) {
-            this.renderEdges();
+            this.gridStateService.setEdges(changes["edges"].currentValue);
+            this.renderGridGraph();
         }
         if (changes["selectedAddOption"] && changes["selectedAddOption"].currentValue !== changes["selectedAddOption"].previousValue) {
             this.gridEditorService.setSelectedAddOption(changes["selectedAddOption"].currentValue);
@@ -65,18 +68,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private subscribeToEvents(): void {
-        this.successNodeSubscription = this.gridInteractionService.successNodeCreation$.subscribe((createdNode) => {
-            this.gridEditorService.makeTempNodePermanent(createdNode, this.nodes);
-        });
-        this.cancelNodeSubscription = this.gridInteractionService.cancelNodeCreation$.subscribe(() => {
-            this.gridEditorService.clearTempNode();
-        });
-        this.successEdgeSubscription = this.gridInteractionService.successEdgeCreation$.subscribe((createdEdge) => {
-            this.gridEditorService.makeTempEdgePermanent(createdEdge, this.nodes);
-        });
-        this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
-            this.gridEditorService.clearTempEdge(true, this.nodes);
-        });
+        this.subscribeToParentEvents();
 
         this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
             this.onTempNodeAdded.emit(tempNode);
@@ -86,25 +78,24 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         });
     }
 
-    private renderNodes(): void {
-        if (!this.nodes || this.areNodesRendered) {
-            return;
-        }
-
-        this.gridRendererService.renderNodes(
-            this.nodes,
-            (clickedNode: NodeUI) => 
-                (this.gridEditorService.handleNodeClick.bind(this.gridEditorService))(clickedNode, this.nodes)
-        );
-        this.areNodesRendered = true;
+    private subscribeToParentEvents(): void {
+        this.successNodeSubscription = this.gridInteractionService.successNodeCreation$.subscribe((createdNode) => {
+            this.gridEditorService.makeTempNodePermanent(createdNode);
+        });
+        this.cancelNodeSubscription = this.gridInteractionService.cancelNodeCreation$.subscribe(() => {
+            this.gridEditorService.clearTempNode();
+        });
+        this.successEdgeSubscription = this.gridInteractionService.successEdgeCreation$.subscribe((createdEdge) => {
+            this.gridEditorService.makeTempEdgePermanent(createdEdge);
+        });
+        this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
+            this.gridEditorService.clearTempEdge(true);
+        });
     }
 
-    private renderEdges(): void {
-        if (!this.edges || !this.nodes) {
-            return;
-        }
-
-        this.gridRendererService.renderEdges(this.edges, this.nodes);
-        this.areEdgesRendered = true;
+    private renderGridGraph(): void {
+        if (!this.nodes || !this.edges || this.isGraphRendered) return;
+        
+        this.gridRendererService.renderGraph();
     }
 }

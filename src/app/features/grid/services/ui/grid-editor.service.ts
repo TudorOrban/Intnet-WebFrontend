@@ -3,6 +3,8 @@ import { LeafletMouseEvent } from "leaflet";
 import { NodeUI } from "../../models/Bus";
 import { EdgeType, EdgeUI } from "../../models/Edge";
 import { GridRendererService } from "./grid-renderer.service";
+import { GridStateService } from "./grid-state.service";
+import { GridEventService } from "./grid-event.service";
 
 @Injectable({
     providedIn: "root"
@@ -20,16 +22,20 @@ export class GridEditorService {
     onTempEdgeAdded = new EventEmitter<EdgeUI>();
 
     constructor(
-        private gridRendererService: GridRendererService
-    ) {}
+        private readonly gridStateService: GridStateService,
+        private readonly gridEventService: GridEventService,
+        private readonly gridRendererService: GridRendererService,
+    ) {
+        this.gridEventService.nodeClicked$.subscribe((clickedNode) => {
+            this.handleAddEdgeNodeClick(clickedNode);
+        });
+    }
 
     setSelectedAddOption(option?: string): void {
         this.selectedAddOption = option;
     }
     
-    handleMapClick(
-        e: LeafletMouseEvent
-    ): void {
+    handleMapClick(e: LeafletMouseEvent): void {
         const clickedLat = e.latlng.lat;
         const clickedLng = e.latlng.lng;
         console.log(`Latitude: ${clickedLat}, Longitude: ${clickedLng}`);
@@ -41,40 +47,38 @@ export class GridEditorService {
         }
     }
 
-    private handleAddNodeMapClick(
-        clickedLat: number, 
-        clickedLng: number,
-    ): void {
+    private handleAddNodeMapClick(clickedLat: number, clickedLng: number,): void {
         this.gridRendererService.removeNodeFromMap(this.tempNodeMarker);
 
         this.tempNode = { id: 0, gridId: 0, latitude: clickedLat, longitude: clickedLng, isTemporary: true }
-        this.tempNodeMarker = this.gridRendererService.buildNodeMarker(this.tempNode, this.handleNodeClick.bind(this));
+        this.tempNodeMarker = this.gridRendererService.buildNodeMarker(this.tempNode);
         this.gridRendererService.addNodeToMap(this.tempNodeMarker);
 
         this.onTempNodeAdded.emit(this.tempNode);
     }
 
-    handleNodeClick(clickedNode: NodeUI, nodes?: NodeUI[]): void {
+    handleAddEdgeNodeClick(clickedNode: NodeUI): void {
         if (this.selectedAddOption !== "edge") {
             return;
         }
 
         if (!this.tempSrcNodeId) {
-            this.handleSrcNodeClick(clickedNode, nodes);
+            this.handleSrcNodeClick(clickedNode);
             return;
         }
         
         if (this.tempDestNodeId) {
-            this.clearTempEdge(false, nodes);
+            this.clearTempEdge(false);
         }
 
-        this.handleDestNodeClick(clickedNode, nodes);
+        this.handleDestNodeClick(clickedNode);
     }
 
-    private handleSrcNodeClick(clickedNode: NodeUI, nodes?: NodeUI[]) {
+    private handleSrcNodeClick(clickedNode: NodeUI) {
         this.tempSrcNodeId = clickedNode.id;
         this.tempEdge.srcBusId = clickedNode.id;
 
+        const nodes = this.gridStateService.nodes;
         nodes?.forEach((node) => {
             if (node.id === clickedNode.id) {
                 node.isSelected = true;
@@ -83,17 +87,18 @@ export class GridEditorService {
         });
     }
 
-    private handleDestNodeClick(bus: NodeUI, nodes?: NodeUI[]) {
+    private handleDestNodeClick(bus: NodeUI) {
         this.tempDestNodeId = bus.id;
         this.tempEdge.destBusId = bus.id;
 
+        const nodes = this.gridStateService.nodes;
         nodes?.forEach((node) => {
             if (node.id !== bus.id) {
                 return;
             }
 
             node.isSelected = true;
-            const determined = this.gridRendererService.determineNodeLatLong(this.tempEdge, nodes);
+            const determined = this.gridRendererService.determineNodeLatLong(this.tempEdge);
             if (!determined) {
                 return;
             }
@@ -107,34 +112,35 @@ export class GridEditorService {
         });
     }
 
-    makeTempNodePermanent(createdNode: NodeUI, nodes?: NodeUI[]): void {
+    makeTempNodePermanent(createdNode: NodeUI): void {
         this.clearTempNode();
+        this.gridStateService.addNode(createdNode);
 
-        const boundClickHandler = (clickedNode: NodeUI) => {
-            this.handleNodeClick(clickedNode, nodes); // Capture nodes in the closure
-        };
-        const createdNodeMarker = this.gridRendererService.buildNodeMarker(createdNode, boundClickHandler);
+        const createdNodeMarker = this.gridRendererService.buildNodeMarker(createdNode);
         this.gridRendererService.addNodeToMap(createdNodeMarker);
-        nodes?.push(createdNode);
     }
 
     clearTempNode(): void {
         this.gridRendererService.removeNodeFromMap(this.tempNodeMarker);
     }
 
-    makeTempEdgePermanent(createdEdge: EdgeUI, nodes?: NodeUI[]): void {
-        this.clearTempEdge(true, nodes);
+    makeTempEdgePermanent(createdEdge: EdgeUI): void {
+        this.clearTempEdge(true);
 
-        const determined = this.gridRendererService.determineNodeLatLong(createdEdge, nodes);
+        const determined = this.gridRendererService.determineNodeLatLong(createdEdge);
         if (!determined) return;
+
+        this.gridStateService.addEdge(createdEdge);
+
         const createdEdgePolyline = this.gridRendererService.buildEdgePolyline(createdEdge);
         this.gridRendererService.addEdgeToMap(createdEdgePolyline);
     }
 
-    clearTempEdge(clearSrcNode?: boolean, nodes?: NodeUI[]): void {
+    clearTempEdge(clearSrcNode?: boolean): void {
         this.gridRendererService.removeEdgeFromMap(this.tempEdgePolyline);
 
         // Clear selection of old dest node
+        const nodes = this.gridStateService.nodes;
         nodes?.forEach((node) => {
             if (node.id === this.tempSrcNodeId && clearSrcNode) {
                 node.isSelected = false;
