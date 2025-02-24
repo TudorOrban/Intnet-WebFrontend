@@ -4,7 +4,7 @@ import { Subject } from "rxjs";
 @Injectable({
     providedIn: "root"
 })
-export class GridInteractionService {
+export class GridMapCommunicatorService {
     private cancelNodeCreationSubject = new Subject<void>();
     cancelNodeCreation$ = this.cancelNodeCreationSubject.asObservable();
     

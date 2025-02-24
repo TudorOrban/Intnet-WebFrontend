@@ -12,7 +12,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDiagramProject, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { UIItem } from '../../../../shared/common/types/Navigation';
 import { gridAddOptions } from '../../config/gridAddOptions';
-import { GridInteractionService } from '../../services/ui/grid-interaction.service';
+import { GridMapCommunicatorService } from '../../services/ui/grid-interaction.service';
 import { SelectComponent } from "../../../../shared/common/components/select/select.component";
 
 @Component({
@@ -46,7 +46,7 @@ export class GridComponent implements OnInit, OnDestroy {
     constructor(
         private readonly busService: BusService,
         private readonly edgeService: EdgeService,
-        private readonly gridInteractionService: GridInteractionService,
+        private readonly gridInteractionService: GridMapCommunicatorService,
         private readonly selectedGridService: SelectedGridService,
     ) {}
 

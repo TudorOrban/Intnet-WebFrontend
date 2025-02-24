@@ -43,7 +43,7 @@ export class GridRendererService {
         if (!this.L || !this.map) return;
 
         nodes?.forEach((node, index) => {
-            const marker = this.addNodeMarker(node, handleNodeClick);
+            const marker = this.buildNodeMarker(node, handleNodeClick);
             marker.addTo(this.map!);
 
             if (index === 0) {
@@ -59,12 +59,12 @@ export class GridRendererService {
             const determined = this.determineNodeLatLong(edge, nodes);
             if (!determined) return;
 
-            const polyline = this.addEdgePolyline(edge);
+            const polyline = this.buildEdgePolyline(edge);
             polyline.addTo(this.map!);
         });
     }
 
-    addNodeMarker(
+    buildNodeMarker(
         node: NodeUI, 
         handleNodeClick?: (clickedNode: NodeUI) => void
     ): L.Marker {
@@ -103,7 +103,7 @@ export class GridRendererService {
         return true;
     }
 
-    addEdgePolyline(edge: EdgeUI): L.Polyline {
+    buildEdgePolyline(edge: EdgeUI): L.Polyline {
         return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
             color: 'blue',
             weight: 3,
