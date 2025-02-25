@@ -1,9 +1,9 @@
 <main class="flex overflow-hidden">
   <div class="flex w-full">
       <app-sidebar
-          class="h-full max-w-64 bg-white shadow-md overflow-auto"
+          class="fixed h-full max-w-64 bg-white shadow-md overflow-auto"
       ></app-sidebar>
-      <div class="flex-1 overflow-y-auto bg-white">
+      <div class="flex-1 ml-64 overflow-y-auto bg-white">
           <router-outlet></router-outlet>
       </div>
   </div>

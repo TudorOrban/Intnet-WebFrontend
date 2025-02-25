@@ -1,84 +1,5 @@
 <div class="page-std-padding-x page-std-padding-y overflow-y-auto">
-    <div class="flex items-center justify-between w-full pb-4">
-        <div class="flex items-center space-x-4">
-            <fa-icon [icon]="faDiagramProject"></fa-icon>
-            <div class="text-2xl font-semibold">
-                Map
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-2">
-            <button class="standard-write-button" (click)="toggleAddMenu()">
-                <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
-                <div>
-                    Add
-                </div>
-            </button>
-        </div>
-    </div>
-
-    <div *ngIf="isAddMenuOpen" class="flex items-center space-x-12 flex-wrap w-full px-4 pb-4">
-        <button 
-            *ngFor="let option of addOptions" 
-            (click)="elementCreationService.selectAddOption(option.value)"
-            class="flex items-center space-x-2 cursor-pointer" 
-            [ngClass]="{
-                'text-blue-600': option.value === elementCreationService.getSelectedAddOption()
-            }"
-        >
-            <fa-icon [icon]="option?.icon ?? faQuestion"></fa-icon>
-            <div class="text-lg font-semibold">
-                {{ option?.label }}
-            </div>
-        </button>
-    </div>
-
-    <div *ngIf="isAddMenuOpen && !elementCreationService.getSelectedAddOption()" class="pb-4 text-gray-800">
-        Select the type of element you want to add to the grid.
-    </div>
-
-    <div *ngIf="isAddMenuOpen && elementCreationService.getSelectedAddOption() && !elementCreationService.getIsCreateBusReady() && !elementCreationService.getIsCreateEdgeReady()" class="pb-4 text-gray-800">
-        {{ getAddOptionInfo() }}
-    </div>
-
-    <div *ngIf="elementCreationService.getIsCreateBusReady()" class="flex items-center w-full space-x-8 pb-4">
-        <input 
-            type="text" 
-            [(ngModel)]="elementCreationService.getCreateBusDto().busName"
-            placeholder="Bus Name"
-            class="w-60 h-10 px-4 border border-gray-300 rounded-md shadow-sm"
-        />
-        <div class="flex items-center space-x-2">
-            <button class="standard-write-button" (click)="elementCreationService.handleConfirmAddNode()">
-                Confirm
-            </button>
-            <button class="standard-cancel-button" (click)="elementCreationService.handleCancelAddNode()">
-                Cancel
-            </button>
-        </div>
-    </div>
-
-    <div *ngIf="elementCreationService.getIsCreateEdgeReady()" class="flex items-center w-full space-x-8 pb-4">
-        <input 
-            type="text" 
-            [(ngModel)]="elementCreationService.getCreateEdgeDto().edgeName"
-            placeholder="Edge Name"
-            class="w-60 h-10 px-4 border border-gray-300 rounded-md shadow-sm"
-        />
-        <app-select
-            [items]="elementCreationService.getEdgeTypeOptions()"
-            (onItemSelected)="elementCreationService.handleEdgeTypeSelected($event)"
-        >
-        </app-select>
-        <div class="flex items-center space-x-2">
-            <button class="standard-write-button" (click)="elementCreationService.handleConfirmAddEdge()">
-                Confirm
-            </button>
-            <button class="standard-cancel-button" (click)="elementCreationService.handleCancelAddEdge()">
-                Cancel
-            </button>
-        </div>
-    </div>
+    <app-grid-header></app-grid-header>
 
     <div class="border border-gray-400">
         <app-grid-map
@@ -88,4 +9,7 @@
         ></app-grid-map>
     </div>
 
+    <app-add-element-panel
+        [isAddModeOn]="true"
+    ></app-add-element-panel>
 </div>

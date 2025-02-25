@@ -9,15 +9,14 @@ import { GridMapComponent } from "./grid-map/grid-map.component";
 import { EdgeService } from '../../services/api/edge.service';
 import { EdgeSearchDto } from '../../models/Edge';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDiagramProject, faPlus, faQuestion } from '@fortawesome/free-solid-svg-icons';
-import { UIItem } from '../../../../shared/common/types/Navigation';
-import { gridAddOptions } from '../../config/gridAddOptions';
-import { SelectComponent } from "../../../../shared/common/components/select/select.component";
+import { faDiagramProject, faEdit, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { GridElementCreationService } from '../../services/ui/map-wrapper/grid-element-creation.service';
+import { AddElementPanelComponent } from "./add-element-panel/add-element-panel.component";
+import { GridHeaderComponent } from "./grid-header/grid-header.component";
 
 @Component({
   selector: 'app-grid',
-  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent, SelectComponent],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent, AddElementPanelComponent, GridHeaderComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.css'
 })
@@ -28,8 +27,6 @@ export class GridComponent implements OnInit, OnDestroy {
     buses?: BusSearchDto[];
     edges?: EdgeSearchDto[];
 
-    isAddMenuOpen: boolean = true;
-    addOptions: UIItem[] = gridAddOptions;
 
     constructor(
         private readonly busService: BusService,
@@ -73,18 +70,4 @@ export class GridComponent implements OnInit, OnDestroy {
         );
     }
 
-    toggleAddMenu(): void {
-        this.isAddMenuOpen = !this.isAddMenuOpen;
-    }
-
-    // Utils
-    getAddOptionInfo(): string | undefined {
-        const selectedOption = this.elementCreationService.getSelectedAddOption();
-        const addOption = this.addOptions.find(o => o.value === selectedOption);
-        return addOption?.info;
-    }
-
-    faPlus = faPlus;
-    faDiagramProject = faDiagramProject;
-    faQuestion = faQuestion;
 }
