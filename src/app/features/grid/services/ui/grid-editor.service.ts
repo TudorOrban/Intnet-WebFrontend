@@ -115,6 +115,9 @@ export class GridEditorService {
     }
 
     private handleDestNodeClick(bus: NodeUI) {
+        if (bus.id === this.tempSrcNodeId) {
+            return;
+        }
         this.tempDestNodeId = bus.id;
         this.tempEdge.destBusId = bus.id;
 

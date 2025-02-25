@@ -5,6 +5,7 @@ import { EdgeType, EdgeUI } from "../../models/Edge";
 import { GridStateService } from "./grid-state.service";
 import { GridEventService } from "./grid-event.service";
 import { gridStyles } from "../../config/gridStyles";
+import { NodeType } from "../../models/GridStyles";
 
 @Injectable({
     providedIn: "root"
@@ -110,13 +111,15 @@ export class GridRendererService {
         });
 
         const domElement = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
+        const nodeType = node?.isDistributionNode ? NodeType.DISTRIBUTION : NodeType.TRANSMISSION;
+        const size = gridStyles.nodeStyles.default[nodeType].size;
 
         return this.L.marker([node.latitude, node.longitude], {
             icon: this.L.divIcon({
                 html: domElement,
-                class: 'flex items-center justify-center w-5 h-5',
+                class: 'flex items-center justify-center',
                 className: 'div-icon-custom',
-                iconSize: [16, 16],
+                iconSize: [size, size],
             }),
         });
     }
@@ -147,6 +150,7 @@ export class GridRendererService {
         polyline.on("click", () => {
             isSelected = !isSelected;
             this.updateEdgeStyle(polyline, edge.edgeType, isSelected ? "selected" : "default");
+            this.gridStateService.setSelectedEdge(edge);
         });
 
         polyline.on("mouseover", () => {

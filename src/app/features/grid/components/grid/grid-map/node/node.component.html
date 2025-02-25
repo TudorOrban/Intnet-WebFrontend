@@ -1,10 +1,9 @@
 <button 
     (click)="clickNode()"
-    class="w-4 h-4 rounded-full node" 
-    [ngClass]="{
-        'node-selected': node?.isSelected,
-        'node-temporary': node?.isTemporary,
-        'node-distribution': node?.isDistributionNode
-    }"
+    class="rounded-full node"
+    [style.backgroundColor]="nodeStyle.color"
+    [style.width.px]="nodeStyle.size"
+    [style.height.px]="nodeStyle.size"
+    [style.border]="nodeStyle.border"
 >
 </button>
