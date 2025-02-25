@@ -4,17 +4,10 @@
             Metadata
         </div>
         <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
-            <div class="font-semibold">Grid ID:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.gridId ?? "" }}</div>
-            <div class="font-semibold">Bus Name:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.busName ?? "" }}</div>
-            <div class="font-semibold">Created at:</div>
-            <div></div>
-            <!-- <div class="text-gray-800">{{ dataFormatterService.formatDate(gridStateService.selectedNode?.createdAt) }}</div> -->
-            <div class="font-semibold">Latitude:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.latitude ?? "" }}</div>
-            <div class="font-semibold">Longitude:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.longitude ?? "" }}</div>
+            <ng-container *ngFor="let field of metadataFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div>{{ getValue(gridStateService.selectedNode, field.path, field.type) }}</div>
+            </ng-container>
         </div>
     </div>
 
@@ -23,19 +16,10 @@
             State
         </div>
         <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
-            <div class="font-semibold">Last Updated:</div>
-            <div></div>
-            <!-- <div class="text-gray-800">{{ dataFormatterService.formatDate(gridStateService.selectedNode?.state?.updatedAt) }}</div> -->
-            <div class="font-semibold">Voltage Magnitude:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.state?.voltageMagnitude ?? "" }}</div>
-            <div class="font-semibold">Voltage Angle:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.state?.voltageAngle ?? "" }}</div>
-            <div class="font-semibold">Active Power Injection:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.state?.activePowerInjection ?? "" }}</div>
-            <div class="font-semibold">Reactive Power Injection:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.state?.reactivePowerInjection ?? "" }}</div>
-            <div class="font-semibold">Phase Shifting Transformer Tap Position:</div>
-            <div class="text-gray-800">{{ gridStateService.selectedNode?.state?.phaseShiftingTransformerTapPosition ?? "" }}</div>
+            <ng-container *ngFor="let field of stateFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div>{{ getValue(gridStateService.selectedNode, field.path, field.type) }}</div>
+            </ng-container>
         </div>
     </div>
 </div>
