@@ -39,7 +39,7 @@ export interface BusStateDto {
     voltageAngle?: number;
     activePowerInjection?: number;
     reactivePowerInjection?: number;
-    shuntCapacitatorReactoStatus?: boolean;
+    shuntCapacitorReactorStatus?: boolean;
     phaseShiftingTransformerTapPosition?: number;
 }
 

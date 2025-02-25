@@ -1,1 +1,7 @@
-<p>grid-details-panel works!</p>
+<app-bus-details-panel
+    *ngIf="!!gridStateService.selectedNode"
+></app-bus-details-panel>
+
+<app-edge-details-panel
+    *ngIf="!!gridStateService.selectedEdge"
+></app-edge-details-panel>

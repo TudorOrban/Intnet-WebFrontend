@@ -13,6 +13,7 @@ export class GridDetailsService {
         private readonly gridEventService: GridEventService,
     ) {
         this.gridEventService.nodeClicked$.subscribe((clickedNode) => {
+            console.log("Selected");
             this.viewNodeDetails(clickedNode);
         });
     }

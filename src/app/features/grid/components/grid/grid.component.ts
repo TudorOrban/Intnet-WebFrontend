@@ -14,10 +14,11 @@ import { GridElementCreationService } from '../../services/ui/map-wrapper/grid-e
 import { AddElementPanelComponent } from "./add-element-panel/add-element-panel.component";
 import { GridHeaderComponent } from "./grid-header/grid-header.component";
 import { GridStateService } from '../../services/ui/grid-state.service';
+import { GridDetailsPanelComponent } from "./grid-details-panel/grid-details-panel.component";
 
 @Component({
   selector: 'app-grid',
-  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent, AddElementPanelComponent, GridHeaderComponent],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, GridMapComponent, AddElementPanelComponent, GridHeaderComponent, GridDetailsPanelComponent],
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.css'
 })
