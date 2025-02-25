@@ -4,6 +4,7 @@ import { NodeComponent } from "../../components/grid/grid-map/node/node.componen
 import { EdgeType, EdgeUI } from "../../models/Edge";
 import { GridStateService } from "./grid-state.service";
 import { GridEventService } from "./grid-event.service";
+import { gridStyles } from "../../config/gridStyles";
 
 @Injectable({
     providedIn: "root"
@@ -135,9 +136,40 @@ export class GridRendererService {
     }
 
     buildEdgePolyline(edge: EdgeUI): L.Polyline {
-        return this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
-            color: edge.edgeType === EdgeType.TRANSMISSION ? "blue" : "green",
-            weight: edge.edgeType === EdgeType.TRANSMISSION ? 3 : 2,
+        const defaultStyle = gridStyles.edgeStyles.default[edge.edgeType];
+        const polyline = this.L.polyline([edge.srcNodeLatLong, edge.destNodeLatLong], {
+            color: defaultStyle.color,
+            weight: defaultStyle.weight,
+        });
+
+        let isSelected = false;
+
+        polyline.on("click", () => {
+            isSelected = !isSelected;
+            this.updateEdgeStyle(polyline, edge.edgeType, isSelected ? "selected" : "default");
+        });
+
+        polyline.on("mouseover", () => {
+            if (isSelected) return;
+            this.updateEdgeStyle(polyline, edge.edgeType, "hovered");
+        });
+    
+        polyline.on("mouseout", () => {
+            if (isSelected) return;
+            this.updateEdgeStyle(polyline, edge.edgeType, "default");
+        });
+    
+        return polyline;
+    }
+
+    updateEdgeStyle(polyline: L.Polyline, edgeType: EdgeType, state: "default" | "hovered" | "selected"): void {
+        const style = gridStyles.edgeStyles[state]?.[edgeType];
+        if (!style) {
+            return;
+        }
+        polyline.setStyle({
+            color: style.color,
+            weight: style.weight
         });
     }
 

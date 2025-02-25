@@ -60,6 +60,8 @@ export enum EdgeType {
 export interface EdgeUI extends EdgeSearchDto {
     srcNodeLatLong?: number[];
     destNodeLatLong?: number[];
+    isSelected?: boolean;
+    isTemporary?: boolean;
 }
 
 export interface TempEdgeUI {

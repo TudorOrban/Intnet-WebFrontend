@@ -1,1 +1,25 @@
-<p>edge-details-panel works!</p>
+<div class="grid grid-cols-2 gap-x-20 p-4 bg-gray-50 text-gray-800 border border-gray-300 rounded-b-md shadow-sm">
+    <div>
+        <div class="text-lg font-semibold pb-2">
+            Metadata
+        </div>
+        <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
+            <ng-container *ngFor="let field of metadataFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div>{{ getValue(gridStateService.selectedEdge, field.path, field.type) }}</div>
+            </ng-container>
+        </div>
+    </div>
+
+    <div>
+        <div class="text-lg font-semibold pb-2">
+            Attributes
+        </div>
+        <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
+            <ng-container *ngFor="let field of attributeFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div>{{ getValue(gridStateService.selectedEdge, field.path) }}</div>
+            </ng-container>
+        </div>
+    </div>
+</div>

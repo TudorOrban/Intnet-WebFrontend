@@ -9,6 +9,7 @@ import { EdgeUI } from "../../models/Edge";
 export class GridEventService {
     mapClicked$ = new Subject<L.LeafletMouseEvent>();
     nodeClicked$ = new Subject<NodeUI>();
+    edgeClicked$ = new Subject<EdgeUI>();
     nodeAdded$ = new Subject<NodeUI>();
     edgeAdded$ = new Subject<EdgeUI>();
 
@@ -18,6 +19,10 @@ export class GridEventService {
 
     publishNodeClicked(node: NodeUI): void {
         this.nodeClicked$.next(node);
+    }
+
+    publishEdgeClicked(edge: EdgeUI): void {
+        this.edgeClicked$.next(edge);
     }
 
     publishNodeAdded(node: NodeUI): void {
