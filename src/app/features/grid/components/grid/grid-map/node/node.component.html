@@ -10,9 +10,15 @@
         [style.border]="nodeStyle.border"
     ></button>
 
-    <div *ngIf="(node?.generators?.length ?? 0) > 0" class="absolute top-0 left-0">
-        <div *ngFor="let generator of node?.generators; let i = index" [ngStyle]="getGeneratorPosition(i)">
+    <div *ngIf="node?.generatorPositions && (node?.generatorPositions?.length ?? 0) > 0" class="absolute inset-0">
+        <button 
+            *ngFor="let position of node?.generatorPositions ?? []; let i = index;" 
+            (click)="clickGenerator(i)"
+            class="absolute cursor-pointer" 
+            [style.left.px]="position.x" 
+            [style.top.px]="position.y"
+        >
             <fa-icon [icon]="faIndustry" class="text-lg text-gray-700"></fa-icon>
-        </div>
+        </button>
     </div>
 </div>

@@ -6,6 +6,7 @@ import { gridStyles } from '../../../../config/gridStyles';
 import { GridEventService } from '../../../../services/ui/grid-event.service';
 import { faIndustry } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { GridStateService } from '../../../../services/ui/grid-state.service';
 
 @Component({
   selector: 'app-node',
@@ -22,19 +23,20 @@ export class NodeComponent {
     faIndustry = faIndustry;
 
     constructor(
-        private readonly gridEventService: GridEventService
+        private readonly gridEventService: GridEventService,
+        private readonly gridStateService: GridStateService,
     ) {
         this.gridEventService.nodeClicked$.subscribe((clickedNode: NodeUI) => {
             if (clickedNode.id !== this.node?.id) {
                 this.updateStyles("default");
-                return;
             }
-            console.log("T:", this.node?.id);
         });
     }
 
     ngOnInit() {
         this.updateStyles("default");
+        if (!this.node) return;
+        this.node.generatorPositions = this.calculateGeneratorPositions();
     }
 
     clickNode(): void {
@@ -65,13 +67,32 @@ export class NodeComponent {
         }
     }
 
-    getGeneratorPosition(index: number): any {
-        const angle = (index / (this.node?.generators?.length || 1)) * 2 * Math.PI;
-        const radius = 0.5 * this.nodeStyle.size;
-        const x = radius * Math.cos(angle) + 8;
-        const y = radius * Math.sin(angle) + 8;
-        return {
-            transform: `translate(${x}px, ${y}px)`,
-        };
+    clickGenerator(generatorIndex: number): void {
+        if (!this.node) return;
+
+        const generator = this.node.generators?.[generatorIndex];
+        if (!generator) return;
+        this.gridStateService.setSelectedGenerator(generator);
+        // this.gridEventService.publishGeneratorClicked(generator);
+    }
+
+    // Util
+    calculateGeneratorPositions(): { x: number; y: number }[] {
+        if (!this.node?.generators || this.node?.generators.length === 0 || !this.nodeStyle) {
+            return [];
+        }
+    
+        const positions = [];
+        const radius = 0.93 * this.nodeStyle.size;
+        const yOffset = 0.5 * this.nodeStyle.size;
+    
+        for (let i = 0; i < this.node?.generators.length; i++) {
+            const angle = (i / this.node?.generators.length) * 2 * Math.PI;
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle) - yOffset;
+            positions.push({ x: x, y: y });
+        }
+    
+        return positions;
     }
 }

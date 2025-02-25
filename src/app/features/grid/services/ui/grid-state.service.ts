@@ -2,26 +2,27 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { NodeUI } from "../../models/Bus";
 import { EdgeUI } from "../../models/Edge";
-import { GridState } from "../../models/GridState";
+import { GridComponentState } from "../../models/GridComponentState";
+import { GeneratorUI } from "../../models/Generator";
 
 @Injectable({
     providedIn: "root"
 })
 export class GridStateService {
-    private initialState: GridState = {
+    private initialState: GridComponentState = {
         gridData: { nodes: [], edges: [] },
         gridModes: { isAddModeOn: false, isEditModeOn: false, isDeleteModeOn: false },
-        gridSelection: { selectedNode: undefined, selectedEdge: undefined }
+        gridSelection: { selectedNode: undefined, selectedEdge: undefined, selectedGenerator: undefined }
     }
 
-    private stateSubject = new BehaviorSubject<GridState>(this.initialState);
+    private stateSubject = new BehaviorSubject<GridComponentState>(this.initialState);
     state$ = this.stateSubject.asObservable();
 
-    get state(): GridState {
+    get state(): GridComponentState {
         return this.stateSubject.value;
     }
 
-    set state(newState: GridState) {
+    set state(newState: GridComponentState) {
         this.stateSubject.next(newState);
     }
 
@@ -51,6 +52,10 @@ export class GridStateService {
 
     get selectedEdge(): EdgeUI | undefined {
         return this.state.gridSelection.selectedEdge;
+    }
+
+    get selectedGenerator(): GeneratorUI | undefined {
+        return this.state.gridSelection.selectedGenerator;
     }
 
     setNodes(nodes: NodeUI[]): void {
@@ -87,5 +92,9 @@ export class GridStateService {
 
     setSelectedEdge(edge?: EdgeUI): void {
         this.state = { ...this.state, gridSelection: { ...this.state.gridSelection, selectedEdge: edge } };
+    }
+
+    setSelectedGenerator(generator?: GeneratorUI): void {
+        this.state = { ...this.state, gridSelection: { ...this.state.gridSelection, selectedGenerator: generator } };
     }
 }

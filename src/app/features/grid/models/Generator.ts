@@ -49,3 +49,8 @@ export interface GeneratorStateDto {
     reactivePowerGeneration?: number;
     generatorVoltageSetpoint?: number;
 }
+
+// UI
+export interface GeneratorUI extends GeneratorSearchDto {
+
+}
