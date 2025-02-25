@@ -1,9 +1,18 @@
-<button 
-    (click)="clickNode()"
-    class="rounded-full node"
-    [style.backgroundColor]="nodeStyle.color"
-    [style.width.px]="nodeStyle.size"
-    [style.height.px]="nodeStyle.size"
-    [style.border]="nodeStyle.border"
->
-</button>
+<div class="relative">
+    <button 
+        (click)="clickNode()"
+        (mouseover)="hoverNode()"
+        (mouseout)="unhoverNode()"
+        class="rounded-full node cursor-pointer"
+        [style.backgroundColor]="nodeStyle.color"
+        [style.width.px]="nodeStyle.size"
+        [style.height.px]="nodeStyle.size"
+        [style.border]="nodeStyle.border"
+    ></button>
+
+    <div *ngIf="(node?.generators?.length ?? 0) > 0" class="absolute top-0 left-0">
+        <div *ngFor="let generator of node?.generators; let i = index" [ngStyle]="getGeneratorPosition(i)">
+            <fa-icon [icon]="faIndustry" class="text-lg text-gray-700"></fa-icon>
+        </div>
+    </div>
+</div>
