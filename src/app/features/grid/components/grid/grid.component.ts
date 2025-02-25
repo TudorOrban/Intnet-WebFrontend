@@ -13,6 +13,7 @@ import { faDiagramProject, faEdit, faPlus, faTrash } from '@fortawesome/free-sol
 import { GridElementCreationService } from '../../services/ui/map-wrapper/grid-element-creation.service';
 import { AddElementPanelComponent } from "./add-element-panel/add-element-panel.component";
 import { GridHeaderComponent } from "./grid-header/grid-header.component";
+import { GridStateService } from '../../services/ui/grid-state.service';
 
 @Component({
   selector: 'app-grid',
@@ -27,11 +28,11 @@ export class GridComponent implements OnInit, OnDestroy {
     buses?: BusSearchDto[];
     edges?: EdgeSearchDto[];
 
-
     constructor(
         private readonly busService: BusService,
         private readonly edgeService: EdgeService,
         private readonly selectedGridService: SelectedGridService,
+        readonly gridStateService: GridStateService,
         readonly elementCreationService: GridElementCreationService,
     ) {}
 

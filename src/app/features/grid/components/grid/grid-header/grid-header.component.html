@@ -7,14 +7,14 @@
     </div>
 
     <div class="flex items-center space-x-2">
-        <button class="standard-delete-button" (click)="toggleDeleteMode()" [ngClass]="{'active': isDeleteModeOn}">
+        <button class="standard-delete-button" (click)="gridStateService.toggleDeleteMode()" [ngClass]="{'active': gridStateService.isDeleteModeOn}">
             <fa-icon [icon]="faTrash"></fa-icon>
         </button>
-        <button class="standard-write-button" (click)="toggleEditMode()" [ngClass]="{'active': isEditModeOn}">
+        <button class="standard-write-button" (click)="gridStateService.toggleEditMode()" [ngClass]="{'active': gridStateService.isEditModeOn}">
             <fa-icon [icon]="faEdit" class="mr-2"></fa-icon>
             <div>Edit</div>
         </button>
-        <button class="standard-write-button" (click)="toggleAddMode()" [ngClass]="{'active': isAddModeOn}">
+        <button class="standard-write-button" (click)="gridStateService.toggleAddMode()" [ngClass]="{'active': gridStateService.isAddModeOn}">
             <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
             <div>Add</div>
         </button>

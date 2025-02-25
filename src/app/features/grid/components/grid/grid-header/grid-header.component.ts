@@ -7,6 +7,7 @@ import {
     faPlus,
     faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { GridStateService } from "../../../services/ui/grid-state.service";
 
 @Component({
     selector: "app-grid-header",
@@ -15,21 +16,10 @@ import {
     styleUrl: "./grid-header.component.css",
 })
 export class GridHeaderComponent {
-    isAddModeOn: boolean = false;
-    isEditModeOn: boolean = false;
-    isDeleteModeOn: boolean = false;
-
-    toggleAddMode(): void {
-        this.isAddModeOn = !this.isAddModeOn;
-    }
-
-    toggleEditMode(): void {
-        this.isEditModeOn = !this.isEditModeOn;
-    }
-
-    toggleDeleteMode(): void {
-        this.isDeleteModeOn = !this.isDeleteModeOn;
-    }
+    
+    constructor(
+        readonly gridStateService: GridStateService
+    ) {}
 
     faPlus = faPlus;
     faTrash = faTrash;
