@@ -5,6 +5,8 @@ import { EdgeType, EdgeUI } from "../../models/Edge";
 import { GridRendererService } from "./grid-renderer.service";
 import { GridStateService } from "./grid-state.service";
 import { GridEventService } from "./grid-event.service";
+import { Subscription } from "rxjs";
+import { GridMapCommunicatorService } from "./grid-interaction.service";
 
 @Injectable({
     providedIn: "root"
@@ -18,6 +20,11 @@ export class GridEditorService {
     private tempSrcNodeId?: number;
     private tempDestNodeId?: number;
 
+    private successNodeSubscription: Subscription | undefined;
+    private cancelNodeSubscription: Subscription | undefined;
+    private successEdgeSubscription: Subscription | undefined;
+    private cancelEdgeSubscription: Subscription | undefined;
+
     onTempNodeAdded = new EventEmitter<NodeUI>();
     onTempEdgeAdded = new EventEmitter<EdgeUI>();
 
@@ -25,12 +32,29 @@ export class GridEditorService {
         private readonly gridStateService: GridStateService,
         private readonly gridEventService: GridEventService,
         private readonly gridRendererService: GridRendererService,
+        private readonly gridCommunicatorService: GridMapCommunicatorService
     ) {
         this.gridEventService.mapClicked$.subscribe((e) => {
             this.handleMapClick(e);
         })
         this.gridEventService.nodeClicked$.subscribe((clickedNode) => {
             this.handleAddEdgeNodeClick(clickedNode);
+        });
+        this.subscribeToParentEvents();
+    }
+
+    private subscribeToParentEvents(): void {
+        this.successNodeSubscription = this.gridCommunicatorService.successNodeCreation$.subscribe((createdNode) => {
+            this.makeTempNodePermanent(createdNode);
+        });
+        this.cancelNodeSubscription = this.gridCommunicatorService.cancelNodeCreation$.subscribe(() => {
+            this.clearTempNode();
+        });
+        this.successEdgeSubscription = this.gridCommunicatorService.successEdgeCreation$.subscribe((createdEdge) => {
+            this.makeTempEdgePermanent(createdEdge);
+        });
+        this.cancelEdgeSubscription = this.gridCommunicatorService.cancelEdgeCreation$.subscribe(() => {
+            this.clearTempEdge(true);
         });
     }
 

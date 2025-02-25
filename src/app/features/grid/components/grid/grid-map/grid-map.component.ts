@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewContainerRef } from '@angular/core';
 import { NodeUI } from '../../../models/Bus';
 import { EdgeUI } from '../../../models/Edge';
-import { GridMapCommunicatorService } from '../../../services/ui/grid-interaction.service';
-import { Subscription } from 'rxjs';
 import { GridRendererService } from '../../../services/ui/grid-renderer.service';
 import { GridEditorService } from '../../../services/ui/grid-editor.service';
 import { GridStateService } from '../../../services/ui/grid-state.service';
+import { GridElementCreationService } from '../../../services/ui/map-wrapper/grid-element-creation.service';
 
 @Component({
   selector: 'app-grid-map',
@@ -14,17 +13,10 @@ import { GridStateService } from '../../../services/ui/grid-state.service';
   templateUrl: './grid-map.component.html',
   styleUrl: './grid-map.component.css'
 })
-export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
+export class GridMapComponent implements OnInit, OnChanges {
     @Input() nodes?: NodeUI[];
     @Input() edges?: EdgeUI[];
     @Input() selectedAddOption?: string;
-    @Output() onTempNodeAdded = new EventEmitter<NodeUI>();
-    @Output() onTempEdgeAdded = new EventEmitter<EdgeUI>();
-
-    private successNodeSubscription: Subscription | undefined;
-    private cancelNodeSubscription: Subscription | undefined;
-    private successEdgeSubscription: Subscription | undefined;
-    private cancelEdgeSubscription: Subscription | undefined;
 
     isGraphRendered: boolean = false;
 
@@ -32,7 +24,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         private readonly gridStateService: GridStateService,
         private readonly gridRendererService: GridRendererService,
         private readonly gridEditorService: GridEditorService,
-        private readonly gridInteractionService: GridMapCommunicatorService,
+        private readonly elementCreationService: GridElementCreationService,
         private readonly viewContainerRef: ViewContainerRef
     ) {}
 
@@ -56,45 +48,19 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    ngOnDestroy(): void {
-        this.successNodeSubscription?.unsubscribe();
-        this.cancelNodeSubscription?.unsubscribe();
-        this.successEdgeSubscription?.unsubscribe();
-        this.cancelEdgeSubscription?.unsubscribe();
-    }
-
-    private subscribeToEvents(): void {
-        this.subscribeToParentEvents();
-        this.subscribeToEditorEvents();
-    }
-
-    private subscribeToParentEvents(): void {
-        this.successNodeSubscription = this.gridInteractionService.successNodeCreation$.subscribe((createdNode) => {
-            this.gridEditorService.makeTempNodePermanent(createdNode);
-        });
-        this.cancelNodeSubscription = this.gridInteractionService.cancelNodeCreation$.subscribe(() => {
-            this.gridEditorService.clearTempNode();
-        });
-        this.successEdgeSubscription = this.gridInteractionService.successEdgeCreation$.subscribe((createdEdge) => {
-            this.gridEditorService.makeTempEdgePermanent(createdEdge);
-        });
-        this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
-            this.gridEditorService.clearTempEdge(true);
-        });
-    }
-
-    private subscribeToEditorEvents(): void {
-        this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
-            this.onTempNodeAdded.emit(tempNode);
-        });
-        this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
-            this.onTempEdgeAdded.emit(tempEdge);
-        });
-    }
-
     private renderGridGraph(): void {
         if (!this.nodes || !this.edges || this.isGraphRendered) return;
         
         this.gridRendererService.renderGraph();
+    }
+
+
+    private subscribeToEvents(): void {
+        this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
+            this.elementCreationService.handleTempNodeAdded(tempNode);
+        });
+        this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
+            this.elementCreationService.handleTempEdgeAdded(tempEdge);
+        });
     }
 }
