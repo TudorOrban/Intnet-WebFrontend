@@ -7,9 +7,14 @@ import { EdgeUI } from "../../models/Edge";
     providedIn: "root"
 })
 export class GridEventService {
+    mapClicked$ = new Subject<L.LeafletMouseEvent>();
     nodeClicked$ = new Subject<NodeUI>();
     nodeAdded$ = new Subject<NodeUI>();
     edgeAdded$ = new Subject<EdgeUI>();
+
+    publishMapClicked(e: L.LeafletMouseEvent): void {
+        this.mapClicked$.next(e);
+    }
 
     publishNodeClicked(node: NodeUI): void {
         this.nodeClicked$.next(node);

@@ -163,6 +163,12 @@ export class GridComponent implements OnInit, OnDestroy {
         this.createEdgeDto.edgeType = edgeType;
     }
 
+    // Utils
+    getAddOptionInfo(): string | undefined {
+        const addOption = this.addOptions.find(o => o.value === this.selectedAddOption);
+        return addOption?.info;
+    }
+
     faPlus = faPlus;
     faDiagramProject = faDiagramProject;
     faQuestion = faQuestion;

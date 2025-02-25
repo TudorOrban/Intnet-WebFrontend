@@ -26,6 +26,9 @@ export class GridEditorService {
         private readonly gridEventService: GridEventService,
         private readonly gridRendererService: GridRendererService,
     ) {
+        this.gridEventService.mapClicked$.subscribe((e) => {
+            this.handleMapClick(e);
+        })
         this.gridEventService.nodeClicked$.subscribe((clickedNode) => {
             this.handleAddEdgeNodeClick(clickedNode);
         });

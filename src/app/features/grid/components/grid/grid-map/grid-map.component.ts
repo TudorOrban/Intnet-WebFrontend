@@ -37,11 +37,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
     ) {}
 
     async ngOnInit(): Promise<void> {
-        await this.gridRendererService.initMap(
-            "map", 
-            this.viewContainerRef,
-            this.gridEditorService.handleMapClick.bind(this.gridEditorService),
-        );
+        await this.gridRendererService.initMap("map", this.viewContainerRef);
 
         this.subscribeToEvents();
     }
@@ -69,13 +65,7 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
 
     private subscribeToEvents(): void {
         this.subscribeToParentEvents();
-
-        this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
-            this.onTempNodeAdded.emit(tempNode);
-        });
-        this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
-            this.onTempEdgeAdded.emit(tempEdge);
-        });
+        this.subscribeToEditorEvents();
     }
 
     private subscribeToParentEvents(): void {
@@ -90,6 +80,15 @@ export class GridMapComponent implements OnInit, OnChanges, OnDestroy {
         });
         this.cancelEdgeSubscription = this.gridInteractionService.cancelEdgeCreation$.subscribe(() => {
             this.gridEditorService.clearTempEdge(true);
+        });
+    }
+
+    private subscribeToEditorEvents(): void {
+        this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
+            this.onTempNodeAdded.emit(tempNode);
+        });
+        this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
+            this.onTempEdgeAdded.emit(tempEdge);
         });
     }
 

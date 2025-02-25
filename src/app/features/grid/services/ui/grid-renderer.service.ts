@@ -26,7 +26,6 @@ export class GridRendererService {
     async initMap(
         mapElementId: string, 
         viewContainerRef: ViewContainerRef,
-        handleMapClick?: (e: L.LeafletMouseEvent) => void,
     ): Promise<void> {
         this.L = await import('leaflet');
         this.viewContainerRef = viewContainerRef;
@@ -44,7 +43,7 @@ export class GridRendererService {
         }).addTo(this.map);
 
         this.map?.on("click", (e: L.LeafletMouseEvent) => {
-            handleMapClick?.(e);
+            this.gridEventService.publishMapClicked(e);
         });
     }
 

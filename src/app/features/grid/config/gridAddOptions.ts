@@ -1,20 +1,24 @@
 import { faBatteryHalf, faCodeCommit, faCodeMerge, faIndustry, faPlug, faSolarPanel } from "@fortawesome/free-solid-svg-icons";
+import { UIItem } from "../../../shared/common/types/Navigation";
 
-export const gridAddOptions = [
+export const gridAddOptions: UIItem[] = [
     {
         label: "Bus",
         value: "bus",
-        icon: faCodeMerge
+        icon: faCodeMerge,
+        info: "Click anywhere on the map to place a bus node."
     },
     {
         label: "Edge",
         value: "edge",
-        icon: faCodeCommit
+        icon: faCodeCommit,
+        info: "Click on two bus nodes to connect them."
     },
     {
         label: "Generator",
         value: "generator",
-        icon: faIndustry
+        icon: faIndustry,
+        info: "Click on a bus node to add a Generator to it."
     },
     {
         label: "Load",

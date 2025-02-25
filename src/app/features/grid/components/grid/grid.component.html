@@ -33,6 +33,14 @@
         </button>
     </div>
 
+    <div *ngIf="isAddMenuOpen && !selectedAddOption" class="pb-4 text-gray-800">
+        Select the type of element you want to add to the grid.
+    </div>
+
+    <div *ngIf="isAddMenuOpen && selectedAddOption && !isCreateBusReady && !isCreateEdgeReady" class="pb-4 text-gray-800">
+        {{ getAddOptionInfo() }}
+    </div>
+
     <div *ngIf="isCreateBusReady" class="flex items-center w-full space-x-8 pb-4">
         <input 
             type="text" 

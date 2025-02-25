@@ -5,4 +5,5 @@ export interface UIItem {
     value: string;
     link?: string;
     icon?: IconDefinition;
+    info?: string;
 }
