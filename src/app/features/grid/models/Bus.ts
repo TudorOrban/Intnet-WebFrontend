@@ -48,5 +48,5 @@ export interface NodeUI extends BusSearchDto {
     isSelected?: boolean;
     isTemporary?: boolean;
     isDistributionNode?: boolean;
-    generatorPositions?: { x: number; y: number }[];
+    generatorPositions?: Record<number, { x: number; y: number }>;
 }

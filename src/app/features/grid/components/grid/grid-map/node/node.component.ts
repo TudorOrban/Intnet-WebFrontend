@@ -19,12 +19,10 @@ export class NodeComponent {
     @Output() nodeClicked = new EventEmitter<NodeUI>();
 
     nodeStyle: NodeStyle = gridStyles.nodeStyles.default[NodeType.TRANSMISSION];
-    
-    faIndustry = faIndustry;
 
     constructor(
         private readonly gridEventService: GridEventService,
-        private readonly gridStateService: GridStateService,
+        readonly gridStateService: GridStateService,
     ) {
         this.gridEventService.nodeClicked$.subscribe((clickedNode: NodeUI) => {
             if (clickedNode.id !== this.node?.id) {
@@ -77,12 +75,12 @@ export class NodeComponent {
     }
 
     // Util
-    calculateGeneratorPositions(): { x: number; y: number }[] {
+    calculateGeneratorPositions(): Record<number, { x: number; y: number }> {
         if (!this.node?.generators || this.node?.generators.length === 0 || !this.nodeStyle) {
             return [];
         }
     
-        const positions = [];
+        const positions: Record<number, { x: number; y: number }> = {};
         const radius = 0.93 * this.nodeStyle.size;
         const yOffset = 0.5 * this.nodeStyle.size;
     
@@ -90,9 +88,12 @@ export class NodeComponent {
             const angle = (i / this.node?.generators.length) * 2 * Math.PI;
             const x = radius * Math.cos(angle);
             const y = radius * Math.sin(angle) - yOffset;
-            positions.push({ x: x, y: y });
+            positions[this.node?.generators[i].id] = ({ x: x, y: y });
         }
     
         return positions;
     }
+
+    faIndustry = faIndustry;
+    Object = Object;
 }

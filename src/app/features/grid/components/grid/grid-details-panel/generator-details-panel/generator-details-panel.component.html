@@ -1,1 +1,25 @@
-<p>generator-details-panel works!</p>
+<div class="flex p-4 bg-gray-50 text-gray-800 border border-gray-300 rounded-b-md shadow-sm">
+    <div>
+        <div class="text-lg font-semibold pb-2">
+            Metadata
+        </div>
+        <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
+            <ng-container *ngFor="let field of metadataFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div class="ml-2">{{ getValue(gridStateService.selectedGenerator, field.path, field.type) }}</div>
+            </ng-container>
+        </div>
+    </div>
+
+    <div>
+        <div class="text-lg font-semibold pb-2">
+            State
+        </div>
+        <div class="grid grid-cols-2 gap-y-2 whitespace-nowrap">
+            <ng-container *ngFor="let field of stateFields">
+                <div class="font-semibold">{{ field.label }}:</div>
+                <div class="ml-6">{{ getValue(gridStateService.selectedGenerator, field.path, field.type) }}</div>
+            </ng-container>
+        </div>
+    </div>
+</div>
