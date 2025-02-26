@@ -3,8 +3,8 @@ export interface GeneratorSearchDto {
     gridId: number;
     generatorName?: string;
     generatorType?: GeneratorType;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     generatorVoltageSetpoint?: number;
     generatorMaxActivePower?: number;
     generatorMinActivePower?: number;
@@ -55,4 +55,5 @@ export interface GeneratorUI extends GeneratorSearchDto {
     x?: number;
     y?: number;
     isSelected?: boolean;
+    isTemporary?: boolean;
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { GridStateService } from '../../../services/ui/grid-state.service';
 import { CommonModule } from '@angular/common';
-import { GridDetailsService } from '../../../services/ui/map-wrapper/grid-details.service';
+import { GridElementSelectionService } from '../../../services/ui/map-wrapper/grid-element-selection.service';
 import { BusDetailsPanelComponent } from "./bus-details-panel/bus-details-panel.component";
 import { EdgeDetailsPanelComponent } from "./edge-details-panel/edge-details-panel.component";
 import { GeneratorDetailsPanelComponent } from "./generator-details-panel/generator-details-panel.component";
@@ -16,7 +16,7 @@ export class GridDetailsPanelComponent {
 
     constructor(
         readonly gridStateService: GridStateService,
-        private readonly gridDetailsService: GridDetailsService,
+        private readonly gridDetailsService: GridElementSelectionService,
     ) {}
 
 

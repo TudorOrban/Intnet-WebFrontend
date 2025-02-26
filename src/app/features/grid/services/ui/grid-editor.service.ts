@@ -7,6 +7,7 @@ import { GridStateService } from "./grid-state.service";
 import { GridEventService } from "./grid-event.service";
 import { Subscription } from "rxjs";
 import { GridMapCommunicatorService } from "./grid-interaction.service";
+import { GeneratorUI } from "../../models/Generator";
 
 @Injectable({
     providedIn: "root"
@@ -19,6 +20,8 @@ export class GridEditorService {
     private tempEdge: EdgeUI = { id: -1, gridId: -1, srcBusId: -1, destBusId: -1, edgeType: EdgeType.TRANSMISSION };
     private tempSrcNodeId?: number;
     private tempDestNodeId?: number;
+    private tempGenerator?: GeneratorUI;
+    private tempGeneratorNodeId?: number;
 
     private successNodeSubscription: Subscription | undefined;
     private cancelNodeSubscription: Subscription | undefined;
@@ -39,6 +42,7 @@ export class GridEditorService {
         })
         this.gridEventService.nodeClicked$.subscribe((clickedNode) => {
             this.handleAddEdgeNodeClick(clickedNode);
+            this.handleAddGeneratorNodeClick(clickedNode);
         });
         this.subscribeToParentEvents();
     }
@@ -106,7 +110,7 @@ export class GridEditorService {
         this.tempEdge.srcBusId = clickedNode.id;
 
         const nodes = this.gridStateService.nodes;
-        nodes?.forEach((node) => {
+        nodes.forEach((node) => {
             if (node.id === clickedNode.id) {
                 node.isSelected = true;
                 return;
@@ -122,7 +126,7 @@ export class GridEditorService {
         this.tempEdge.destBusId = bus.id;
 
         const nodes = this.gridStateService.nodes;
-        nodes?.forEach((node) => {
+        nodes.forEach((node) => {
             if (node.id !== bus.id) {
                 return;
             }
@@ -137,8 +141,6 @@ export class GridEditorService {
             this.gridRendererService.addEdgeToMap(this.tempEdgePolyline);
 
             this.onTempEdgeAdded.emit(this.tempEdge);
-
-            return;
         });
     }
 
@@ -171,7 +173,7 @@ export class GridEditorService {
 
         // Clear selection of old dest node
         const nodes = this.gridStateService.nodes;
-        nodes?.forEach((node) => {
+        nodes.forEach((node) => {
             if (node.id === this.tempSrcNodeId && clearSrcNode) {
                 node.isSelected = false;
                 this.tempSrcNodeId = undefined;
@@ -185,5 +187,35 @@ export class GridEditorService {
 
     getTempNodeMarker(): L.Marker | undefined {
         return this.tempNodeMarker;
+    }
+
+    handleAddGeneratorNodeClick(clickedNode: NodeUI): void {
+        if (this.selectedAddOption !== "generator") {
+            return;
+        }
+
+        const nodes = this.gridStateService.nodes;
+
+        // Clear previous temp generator
+        if (this.tempGenerator) {
+            nodes.forEach((node) => {
+                if (node.id === this.tempGeneratorNodeId) {
+                    node.generators = node.generators?.filter(g => !g.isTemporary);
+                }
+            });
+        }
+
+        nodes.forEach((node) => {
+            if (node.id !== clickedNode.id) {
+                return;
+            }
+
+            const tempGenerator: GeneratorUI = {
+                id: -1, gridId: -1, isTemporary: true
+            };
+            node.generators?.push(tempGenerator);
+            this.tempGenerator = tempGenerator;
+            this.tempGeneratorNodeId = clickedNode.id;
+        });
     }
 }

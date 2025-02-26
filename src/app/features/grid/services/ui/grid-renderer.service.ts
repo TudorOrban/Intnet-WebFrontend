@@ -188,7 +188,6 @@ export class GridRendererService {
         }
 
         this.updateEdgeStyle(edge.edgeType, "selected", polyline);
-        console.log("Test")
         this.gridStateService.setSelectedEdge(edge);
         this.selectedEdgePolyline = polyline;
     }

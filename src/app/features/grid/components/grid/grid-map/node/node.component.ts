@@ -38,7 +38,6 @@ export class NodeComponent {
     }
 
     clickNode(): void {
-        console.log("N", this.node);
         if (!this.node) return;
 
         this.node.isSelected = true;
@@ -72,10 +71,11 @@ export class NodeComponent {
         const generator = this.node.generators?.find(g => g.id === generatorId);
         if (!generator) return;
 
-        generator.isSelected = true;
+        // this.node.generators?.forEach(g => g.isSelected = false);
+        // generator.isSelected = true;
 
-        this.gridStateService.setSelectedGenerator(generator);
-        // this.gridEventService.publishGeneratorClicked(generator);
+        // this.gridStateService.setSelectedGenerator(generator);
+        this.gridEventService.publishGeneratorClicked(generator);
     }
 
     // Util
@@ -99,7 +99,6 @@ export class NodeComponent {
                 isSelected: false
             }
         }
-        console.log("Positions", positions);
     
         return positions;
     }
