@@ -9,12 +9,11 @@ import { GridMapComponent } from "./grid-map/grid-map.component";
 import { EdgeService } from '../../services/api/edge.service';
 import { EdgeSearchDto } from '../../models/Edge';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDiagramProject, faEdit, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { GridElementCreationService } from '../../services/ui/map-wrapper/grid-element-creation.service';
 import { AddElementPanelComponent } from "./add-element-panel/add-element-panel.component";
 import { GridHeaderComponent } from "./grid-header/grid-header.component";
 import { GridStateService } from '../../services/ui/grid-state.service';
 import { GridDetailsPanelComponent } from "./grid-details-panel/grid-details-panel.component";
+import { GridElementCreationService } from '../../services/ui/element-creation/grid-element-creation.service';
 
 @Component({
   selector: 'app-grid',

@@ -1,3 +1,4 @@
+import { UIItem } from "../../../shared/common/types/Navigation";
 import { NodeUI } from "./Bus";
 import { EdgeUI } from "./Edge";
 import { GeneratorUI } from "./Generator";
@@ -14,9 +15,16 @@ export interface GridData {
 }
 
 export interface GridModes {
-    isAddModeOn: boolean;
+    // isAddModeOn: boolean;
+    addMode: AddMode;
     isEditModeOn: boolean;
     isDeleteModeOn: boolean;
+}
+
+export interface AddMode {
+    isAddModeOn: boolean;
+    addOptions: UIItem[];
+    selectedAddOption?: string;
 }
 
 export interface GridSelection {

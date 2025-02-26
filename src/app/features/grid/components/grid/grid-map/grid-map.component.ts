@@ -5,7 +5,7 @@ import { EdgeUI } from '../../../models/Edge';
 import { GridRendererService } from '../../../services/ui/grid-renderer.service';
 import { GridEditorService } from '../../../services/ui/grid-editor.service';
 import { GridStateService } from '../../../services/ui/grid-state.service';
-import { GridElementCreationService } from '../../../services/ui/map-wrapper/grid-element-creation.service';
+import { GridElementCreationService } from '../../../services/ui/element-creation/grid-element-creation.service';
 
 @Component({
   selector: 'app-grid-map',
@@ -56,8 +56,8 @@ export class GridMapComponent implements OnInit, OnChanges {
 
 
     private subscribeToEvents(): void {
-        this.gridEditorService.onTempNodeAdded.subscribe((tempNode) => {
-            this.elementCreationService.handleTempNodeAdded(tempNode);
+        this.gridEditorService.onTempNodeAdded.subscribe((tempBus) => {
+            this.elementCreationService.handleTempBusAdded(tempBus);
         });
         this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
             this.elementCreationService.handleTempEdgeAdded(tempEdge);

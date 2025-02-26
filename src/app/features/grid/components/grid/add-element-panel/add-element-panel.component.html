@@ -1,10 +1,10 @@
 <div *ngIf="isAddModeOn" class="flex items-center space-x-12 flex-wrap w-full px-4 pt-6 pb-4">
     <button 
         *ngFor="let option of addOptions" 
-        (click)="elementCreationService.selectAddOption(option.value)"
+        (click)="gridStateService.selectAddOption(option.value)"
         class="flex items-center space-x-2 cursor-pointer" 
         [ngClass]="{
-            'text-blue-600': option.value === elementCreationService.getSelectedAddOption()
+            'text-blue-600': option.value === gridStateService.selectedAddOption
         }"
     >
         <fa-icon [icon]="option?.icon ?? faQuestion"></fa-icon>
@@ -14,11 +14,11 @@
     </button>
 </div>
 
-<div *ngIf="isAddModeOn && !elementCreationService.getSelectedAddOption()" class="pb-4 text-gray-800">
+<div *ngIf="isAddModeOn && !this.gridStateService.selectedAddOption" class="pb-4 text-gray-800">
     Select the type of element you want to add to the grid.
 </div>
 
-<div *ngIf="isAddModeOn && elementCreationService.getSelectedAddOption() && !elementCreationService.getIsSomeElementReady()" class="pb-4 text-gray-800">
+<div *ngIf="isAddModeOn && this.gridStateService.selectedAddOption && !elementCreationService.getIsSomeElementReady()" class="pb-4 text-gray-800">
     {{ getAddOptionInfo() }}
 </div>
 
@@ -30,10 +30,10 @@
         class="w-60 h-10 px-4 border border-gray-300 rounded-md shadow-sm"
     />
     <div class="flex items-center space-x-2">
-        <button class="standard-write-button" (click)="elementCreationService.handleConfirmAddNode()">
+        <button class="standard-write-button" (click)="elementCreationService.handleConfirmAddBus()">
             Confirm
         </button>
-        <button class="standard-cancel-button" (click)="elementCreationService.handleCancelAddNode()">
+        <button class="standard-cancel-button" (click)="elementCreationService.handleCancelAddBus()">
             Cancel
         </button>
     </div>

@@ -4,6 +4,7 @@ import { NodeUI } from "../../models/Bus";
 import { EdgeUI } from "../../models/Edge";
 import { GridComponentState } from "../../models/GridComponentState";
 import { GeneratorUI } from "../../models/Generator";
+import { gridAddOptions } from "../../config/gridAddOptions";
 
 @Injectable({
     providedIn: "root"
@@ -11,7 +12,7 @@ import { GeneratorUI } from "../../models/Generator";
 export class GridStateService {
     private initialState: GridComponentState = {
         gridData: { nodes: [], edges: [] },
-        gridModes: { isAddModeOn: false, isEditModeOn: false, isDeleteModeOn: false },
+        gridModes: { addMode: { isAddModeOn: false, addOptions: gridAddOptions, selectedAddOption: undefined }, isEditModeOn: false, isDeleteModeOn: false },
         gridSelection: { selectedNode: undefined, selectedEdge: undefined, selectedGenerator: undefined }
     }
 
@@ -35,7 +36,11 @@ export class GridStateService {
     }
 
     get isAddModeOn(): boolean {
-        return this.state.gridModes.isAddModeOn;
+        return this.state.gridModes.addMode.isAddModeOn;
+    }
+
+    get selectedAddOption(): string | undefined {
+        return this.state.gridModes.addMode.selectedAddOption;
     }
 
     get isEditModeOn(): boolean {
@@ -83,7 +88,11 @@ export class GridStateService {
     }
     
     toggleAddMode(): void {
-        this.state = { ...this.state, gridModes: { ...this.state.gridModes, isAddModeOn: !this.state.gridModes.isAddModeOn } };
+        this.state = { ...this.state, gridModes: { ...this.state.gridModes, addMode: { ...this.state.gridModes.addMode, isAddModeOn: !this.state.gridModes.addMode.isAddModeOn } } };
+    }
+
+    selectAddOption(option?: string): void {
+        this.state = { ...this.state, gridModes: { ...this.state.gridModes, addMode: { ...this.state.gridModes.addMode, selectedAddOption: option } } }
     }
 
     toggleEditMode(): void {
