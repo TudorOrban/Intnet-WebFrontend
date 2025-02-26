@@ -52,5 +52,7 @@ export interface GeneratorStateDto {
 
 // UI
 export interface GeneratorUI extends GeneratorSearchDto {
-    
+    x?: number;
+    y?: number;
+    isSelected?: boolean;
 }

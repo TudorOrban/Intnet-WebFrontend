@@ -3,24 +3,28 @@
         (click)="clickNode()"
         (mouseover)="hoverNode()"
         (mouseout)="unhoverNode()"
-        class="rounded-full node cursor-pointer"
+        class="rounded-full node cursor-pointer z-50"
         [style.backgroundColor]="nodeStyle.color"
         [style.width.px]="nodeStyle.size"
         [style.height.px]="nodeStyle.size"
         [style.border]="nodeStyle.border"
     ></button>
 
-    <div *ngIf="node?.generatorPositions" class="absolute inset-0">
+    <div *ngIf="node?.generators && (node?.generators?.length ?? 0) > 0">
         <button 
-            *ngFor="let entry of Object.entries(node?.generatorPositions ?? {}); let i = index;" 
-            (click)="clickGenerator(i)"
+            *ngFor="let generator of node?.generators; let i = index;" 
+            (click)="clickGenerator(generator.id);"
             class="absolute cursor-pointer" 
-            [style.left.px]="entry[1].x" 
-            [style.top.px]="entry[1].y"
+            [style.left.px]="generator.x" 
+            [style.top.px]="generator.y"
         >
             <fa-icon 
                 [icon]="faIndustry" 
-                class="text-lg text-gray-700"
+                [ngClass]="{
+                    'text-black': generator.isSelected,
+                    'text-gray-700': !generator.isSelected
+                }"
+                class="text-lg"
             ></fa-icon>
         </button>
     </div>

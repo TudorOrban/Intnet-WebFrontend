@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NodeUI } from '../../../../models/Bus';
+import { GeneratorUIData, NodeUI } from '../../../../models/Bus';
 import { CommonModule } from '@angular/common';
 import { NodeStyle, NodeType } from '../../../../models/GridStyles';
 import { gridStyles } from '../../../../config/gridStyles';
@@ -34,10 +34,11 @@ export class NodeComponent {
     ngOnInit() {
         this.updateStyles("default");
         if (!this.node) return;
-        this.node.generatorPositions = this.calculateGeneratorPositions();
+        this.calculateGeneratorPositions();
     }
 
     clickNode(): void {
+        console.log("N", this.node);
         if (!this.node) return;
 
         this.node.isSelected = true;
@@ -65,31 +66,40 @@ export class NodeComponent {
         }
     }
 
-    clickGenerator(generatorIndex: number): void {
+    clickGenerator(generatorId: number): void {
         if (!this.node) return;
 
-        const generator = this.node.generators?.[generatorIndex];
+        const generator = this.node.generators?.find(g => g.id === generatorId);
         if (!generator) return;
+
+        generator.isSelected = true;
+
         this.gridStateService.setSelectedGenerator(generator);
         // this.gridEventService.publishGeneratorClicked(generator);
     }
 
     // Util
-    calculateGeneratorPositions(): Record<number, { x: number; y: number }> {
+    calculateGeneratorPositions(): GeneratorUIData[] {
         if (!this.node?.generators || this.node?.generators.length === 0 || !this.nodeStyle) {
             return [];
         }
     
-        const positions: Record<number, { x: number; y: number }> = {};
-        const radius = 0.93 * this.nodeStyle.size;
+        const positions: GeneratorUIData[] = [];
+        const radius = 1.3 * this.nodeStyle.size;
         const yOffset = 0.5 * this.nodeStyle.size;
     
-        for (let i = 0; i < this.node?.generators.length; i++) {
-            const angle = (i / this.node?.generators.length) * 2 * Math.PI;
+        for (let i = 0; i < this.node.generators.length; i++) {
+            const angle = (i / this.node.generators.length) * 2 * Math.PI;
             const x = radius * Math.cos(angle);
             const y = radius * Math.sin(angle) - yOffset;
-            positions[this.node?.generators[i].id] = ({ x: x, y: y });
+
+            this.node.generators[i] = {
+                ...this.node.generators[i],
+                x, y,
+                isSelected: false
+            }
         }
+        console.log("Positions", positions);
     
         return positions;
     }

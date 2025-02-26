@@ -1,4 +1,4 @@
-import { GeneratorSearchDto } from "./Generator";
+import { GeneratorSearchDto, GeneratorUI } from "./Generator";
 
 export interface BusSearchDto {
     id: number;
@@ -48,5 +48,9 @@ export interface NodeUI extends BusSearchDto {
     isSelected?: boolean;
     isTemporary?: boolean;
     isDistributionNode?: boolean;
-    generatorPositions?: Record<number, { x: number; y: number }>;
+    generators?: GeneratorUI[]
+}
+
+export interface GeneratorUIData {
+    id: number;
 }
