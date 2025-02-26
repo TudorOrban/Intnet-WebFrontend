@@ -27,9 +27,12 @@ export class GridEditorService {
     private cancelNodeSubscription: Subscription | undefined;
     private successEdgeSubscription: Subscription | undefined;
     private cancelEdgeSubscription: Subscription | undefined;
+    private successGeneratorSubscription: Subscription | undefined;
+    private cancelGeneratorSubscription: Subscription | undefined;
 
     onTempNodeAdded = new EventEmitter<NodeUI>();
     onTempEdgeAdded = new EventEmitter<EdgeUI>();
+    onTempGeneratorAdded = new EventEmitter<GeneratorUI>();
 
     constructor(
         private readonly gridStateService: GridStateService,
@@ -59,6 +62,12 @@ export class GridEditorService {
         });
         this.cancelEdgeSubscription = this.gridCommunicatorService.cancelEdgeCreation$.subscribe(() => {
             this.clearTempEdge(true);
+        });
+        this.successGeneratorSubscription = this.gridCommunicatorService.successGeneratorCreation$.subscribe((createdGenerator) => {
+            this.makeTempGeneratorPermanent(createdGenerator);
+        });
+        this.cancelGeneratorSubscription = this.gridCommunicatorService.cancelGeneratorCreation$.subscribe(() => {
+            this.clearTempGenerator();
         });
     }
 
@@ -197,13 +206,7 @@ export class GridEditorService {
         const nodes = this.gridStateService.nodes;
 
         // Clear previous temp generator
-        if (this.tempGenerator) {
-            nodes.forEach((node) => {
-                if (node.id === this.tempGeneratorNodeId) {
-                    node.generators = node.generators?.filter(g => !g.isTemporary);
-                }
-            });
-        }
+        this.clearTempGenerator();
 
         nodes.forEach((node) => {
             if (node.id !== clickedNode.id) {
@@ -211,11 +214,55 @@ export class GridEditorService {
             }
 
             const tempGenerator: GeneratorUI = {
-                id: -1, gridId: -1, isTemporary: true
+                id: -1, gridId: -1, isTemporary: true, busId: node.id
             };
             node.generators?.push(tempGenerator);
             this.tempGenerator = tempGenerator;
             this.tempGeneratorNodeId = clickedNode.id;
+
+            this.onTempGeneratorAdded.emit(tempGenerator);
         });
     }
+
+    makeTempGeneratorPermanent(createdGenerator: GeneratorUI): void {
+        const nodes = this.gridStateService.nodes;
+        if (!this.tempGenerator) {
+            return;
+        }
+
+        // const foundNode = nodes.find(n => n.id === createdGenerator.busId);
+        // if (!foundNode) {
+        //     return;
+        // } 
+        // let tempGenerator = foundNode.generators?.find(g => g.id === createdGenerator.id);
+        // if (!tempGenerator) {
+        //     return;
+        // }
+
+        // tempGenerator = createdGenerator;
+        nodes.forEach((node) => {
+            if (node.id !== createdGenerator.busId) {
+                return;
+            }
+
+            node.generators?.forEach((generator) => {
+                if (generator.id === createdGenerator.id) {
+                    generator = createdGenerator;
+                }
+            });
+        });
+    }
+
+    clearTempGenerator(): void {
+        const nodes = this.gridStateService.nodes;
+        if (!this.tempGenerator) {
+            return;
+        }
+        nodes.forEach((node) => {
+            if (node.id === this.tempGeneratorNodeId) {
+                node.generators = node.generators?.filter(g => !g.isTemporary);
+            }
+        });
+    }
+    
 }

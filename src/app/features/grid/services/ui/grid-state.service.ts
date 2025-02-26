@@ -74,6 +74,14 @@ export class GridStateService {
         this.state = { ...this.state, gridData: { ...this.state.gridData, edges: [...this.state.gridData.edges, edge] } };
     }
 
+    updateNode(updatedNode: NodeUI): void {
+        const updatedNodes = this.state.gridData.nodes.map(node =>
+            node.id === updatedNode.id ? updatedNode : node
+        );
+
+        this.state = { ...this.state, gridData: { ...this.state.gridData, nodes: updatedNodes } };
+    }
+    
     toggleAddMode(): void {
         this.state = { ...this.state, gridModes: { ...this.state.gridModes, isAddModeOn: !this.state.gridModes.isAddModeOn } };
     }

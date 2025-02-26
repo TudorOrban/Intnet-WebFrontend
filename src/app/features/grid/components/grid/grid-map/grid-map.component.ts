@@ -62,5 +62,8 @@ export class GridMapComponent implements OnInit, OnChanges {
         this.gridEditorService.onTempEdgeAdded.subscribe((tempEdge) => {
             this.elementCreationService.handleTempEdgeAdded(tempEdge);
         });
+        this.gridEditorService.onTempGeneratorAdded.subscribe((tempGenerator) => {
+            this.elementCreationService.handleTempGeneratorAdded(tempGenerator);
+        })
     }
 }

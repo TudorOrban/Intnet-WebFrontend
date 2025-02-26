@@ -6,6 +6,8 @@ import { CreateEdgeDto, EdgeType } from "../../../models/Edge";
 import { BusService } from "../../api/bus.service";
 import { EdgeService } from "../../api/edge.service";
 import { GridMapCommunicatorService } from "../grid-interaction.service";
+import { CreateGeneratorDto, GeneratorType, GeneratorUI } from "../../../models/Generator";
+import { GeneratorService } from "../../api/generator.service";
 
 @Injectable({
     providedIn: "root"
@@ -23,10 +25,18 @@ export class GridElementCreationService {
         { label: "Distribution Line", value: "DISTRIBUTION" },
         { label: "Transformer", value: "TRANSFORMER" },
     ];
+    private createGeneratorDto: CreateGeneratorDto = { gridId: -1, busId: -1 };
+    private isCreateGeneratorReady: boolean = false;
+    private generatorTypeOptions: UIItem[] = [
+        { label: "Nuclear Station", value: "NUCLEAR" },
+        { label: "Coal Station", value: "COAL" },
+        { label: "Gas Station", value: "GAS" },
+    ]
 
     constructor(
         private readonly busService: BusService,
         private readonly edgeService: EdgeService,
+        private readonly generatorService: GeneratorService,
         private readonly gridMapCommunicatorService: GridMapCommunicatorService
     ) {}
 
@@ -37,6 +47,13 @@ export class GridElementCreationService {
     getCreateEdgeDto(): CreateEdgeDto { return this.createEdgeDto; }
     getIsCreateEdgeReady(): boolean { return this.isCreateEdgeReady; }
     getEdgeTypeOptions(): UIItem[] { return this.edgeTypeOptions; }
+    getCreateGeneratorDto(): CreateGeneratorDto { return this.createGeneratorDto; }
+    getIsCreateGeneratorReady(): boolean { return this.isCreateGeneratorReady; }
+    getGeneratorTypeOptions(): UIItem[] { return this.generatorTypeOptions; }
+
+    getIsSomeElementReady(): boolean {
+        return this.isCreateBusReady || this.isCreateEdgeReady || this.isCreateGeneratorReady;
+    }
 
     setGridId(gridId: number | undefined): void {
         this.gridId = gridId;
@@ -115,5 +132,43 @@ export class GridElementCreationService {
     handleEdgeTypeSelected(value: string): void {
         const edgeType = EdgeType[value as keyof typeof EdgeType];
         this.createEdgeDto.edgeType = edgeType;
+    }
+
+    // Generator
+    handleTempGeneratorAdded(tempGenerator: GeneratorUI): void {
+        if (!this.gridId || !tempGenerator.busId) {
+            console.error("No Grid selected");
+            return;
+        }
+
+        this.createGeneratorDto.gridId = this.gridId;
+        this.createGeneratorDto.busId = tempGenerator.busId;
+        this.createGeneratorDto.generatorName = tempGenerator.generatorName;
+
+        this.isCreateGeneratorReady = true;
+    }
+
+    handleConfirmAddGenerator(): void {
+        this.generatorService.createGenerator(this.createGeneratorDto).subscribe(
+            (data) => {
+                this.selectedAddOption = undefined;
+                this.isCreateGeneratorReady = false;
+                this.gridMapCommunicatorService.successGeneratorCreation(data);
+            },
+            (error) => {
+                console.error("Error creating generator:", error);
+            }
+        );
+    }
+
+    handleCancelAddGenerator(): void {
+        this.selectedAddOption = undefined;
+        this.isCreateGeneratorReady = false;
+        this.gridMapCommunicatorService.cancelGeneratorCreation();
+    }
+
+    handleGeneratorTypeSelected(value: string): void {
+        const generatorType = GeneratorType[value as keyof typeof GeneratorType];
+        this.createGeneratorDto.generatorType = generatorType;
     }
 }

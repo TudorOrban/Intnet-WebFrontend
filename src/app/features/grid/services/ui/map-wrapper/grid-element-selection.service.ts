@@ -22,6 +22,7 @@ export class GridElementSelectionService {
     }
 
     private selectClickedNode(clickedNode: NodeUI): void {
+        if (this.gridStateService.isAddModeOn) return;
         this.gridStateService.setSelectedNode(clickedNode);
     }
 

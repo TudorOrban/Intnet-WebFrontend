@@ -22,7 +22,9 @@ export enum GeneratorType {
 
 export interface CreateGeneratorDto {
     gridId: number;
+    busId: number;
     generatorName?: string;
+    generatorType?: GeneratorType;
     generatorVoltageSetpoint?: number;
     generatorMaxActivePower?: number;
     generatorMinActivePower?: number;
@@ -56,4 +58,5 @@ export interface GeneratorUI extends GeneratorSearchDto {
     y?: number;
     isSelected?: boolean;
     isTemporary?: boolean;
+    busId?: number;
 }
