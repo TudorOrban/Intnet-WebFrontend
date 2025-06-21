@@ -32,9 +32,9 @@ or set it up manually by following these steps:
 1. Ensure you have installed: Docker, Minikube, Helm, KubeCTL, Java JDK 21. The ML modules also require a newer version of Python.
 2. Fetch the [Intnet-Platform](https://github.com/TudorOrban/Intnet-Platform) repository and open a terminal in the root.
 3. You need to build a Docker image for each microservice you want to use. For instance, for `intnet-grid-data`, you need to:
-a. navigate to the microservice root: `cd services/intnet-grid-data`
-b. Build the Java project: `mvn clean package -DskipTests`
-c. Build the image: `eval $(minikube docker-env)` and `docker build -t intnet-grid-data:latest .`
+- navigate to the microservice root: `cd services/intnet-grid-data`
+- Build the Java project: `mvn clean package -DskipTests`
+- Build the image: `eval $(minikube docker-env)` and `docker build -t intnet-grid-data:latest .`
 4. Start Minikube and install Kubernetes deployments with Helm: `helm install std-release .`. Scale each service as needed by modifying the `replicaCount` in `kubernetes/dev/helm/values.yaml`.
 5. To interact with the system, port-forward the API gateway, for instance `kubectl port-forward service/std-release-intnet-renai-gateway 8080:8080`. You can now make calls to `localhost:8080`
 6. Optionally, fetch and run (`ng serve`) the [Web Frontend](https://github.com/TudorOrban/Intnet-WebFrontend) to edit your grid, set up devices etc.
